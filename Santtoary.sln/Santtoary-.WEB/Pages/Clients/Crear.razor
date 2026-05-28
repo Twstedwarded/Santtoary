@@ -1,5 +1,5 @@
 ﻿@page "/clientes/crear"
-@inject HttpClient Http
+@inject IRepository repository
 @inject NavigationManager Nav
 
 <h3>Nuevo Cliente</h3>
@@ -40,12 +40,25 @@
     <a href="/clientes" class="btn btn-secondary ms-2">Cancelar</a>
 </EditForm>
 
+@if (mensaje != null)
+{
+    <div class="alert alert-danger">@mensaje</div>
+}
+
 @code {
     private Client cliente = new();
+    private string? mensaje;
 
     async Task Guardar()
     {
-        await Http.PostAsJsonAsync("api/clients", cliente);
-        Nav.NavigateTo("/clientes");
+        var result = await repository.PostAsync("api/clients", cliente);
+        if (result.Error)
+        {
+            mensaje = await result.GetErrorMessageAsync();
+        }
+        else
+        {
+            Nav.NavigateTo("/clientes");
+        }
     }
 }

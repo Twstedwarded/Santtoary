@@ -1,5 +1,5 @@
 ﻿@page "/inventario"
-@inject HttpClient Http
+@inject IRepository repository
 @inject NavigationManager Nav
 
 <h3>Inventario</h3>
@@ -70,7 +70,8 @@ else
 
     async Task Cargar()
     {
-        lista = await Http.GetFromJsonAsync<List<InventoryItem>>("api/inventoryitems");
+        var result = await repository.GetAsync<List<InventoryItem>>("api/inventoryitems");
+        lista = result.Response;
     }
 
     async Task Eliminar(int id)
@@ -78,7 +79,7 @@ else
         var confirm = await JS.InvokeAsync<bool>("confirm", "¿Seguro que deseas eliminar este insumo?");
         if (confirm)
         {
-            await Http.DeleteAsync($"api/inventoryitems/{id}");
+            await repository.DeleteAsync($"api/inventoryitems/{id}");
             mensaje = "Insumo eliminado correctamente.";
             await Cargar();
         }

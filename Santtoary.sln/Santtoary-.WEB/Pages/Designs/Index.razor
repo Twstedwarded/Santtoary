@@ -1,5 +1,5 @@
 ﻿@page "/disenos"
-@inject HttpClient Http
+@inject IRepository repository
 @inject NavigationManager Nav
 
 <h3>Diseños</h3>
@@ -59,7 +59,8 @@ else
 
     async Task Cargar()
     {
-        lista = await Http.GetFromJsonAsync<List<Design>>("api/designs");
+        var result = await repository.GetAsync<List<Design>>("api/designs");
+        lista = result.Response;
     }
 
     async Task Eliminar(int id)
@@ -67,7 +68,7 @@ else
         var confirm = await JS.InvokeAsync<bool>("confirm", "¿Seguro que deseas eliminar este diseño?");
         if (confirm)
         {
-            await Http.DeleteAsync($"api/designs/{id}");
+            await repository.DeleteAsync($"api/designs/{id}");
             mensaje = "Diseño eliminado correctamente.";
             await Cargar();
         }

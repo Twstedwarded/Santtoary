@@ -1,5 +1,5 @@
 ﻿@page "/artistas"
-@inject HttpClient Http
+@inject IRepository repository
 @inject NavigationManager Nav
 
 <h3>Artistas</h3>
@@ -59,7 +59,8 @@ else
 
     async Task Cargar()
     {
-        lista = await Http.GetFromJsonAsync<List<Artist>>("api/artists");
+        var result = await repository.GetAsync<List<Artist>>("api/artists");
+        lista = result.Response;
     }
 
     async Task Eliminar(int id)
@@ -67,7 +68,7 @@ else
         var confirm = await JS.InvokeAsync<bool>("confirm", "¿Seguro que deseas eliminar este artista?");
         if (confirm)
         {
-            await Http.DeleteAsync($"api/artists/{id}");
+            await repository.DeleteAsync($"api/artists/{id}");
             mensaje = "Artista eliminado correctamente.";
             await Cargar();
         }

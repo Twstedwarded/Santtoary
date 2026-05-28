@@ -1,5 +1,5 @@
 ﻿@page "/citas/editar/{Id:int}"
-@inject HttpClient Http
+@inject IRepository repository
 @inject NavigationManager Nav
 
 <h3>Editar Cita</h3>
@@ -71,22 +71,38 @@ else
     </EditForm>
 }
 
+@if (mensaje != null)
+{
+    <div class="alert alert-danger">@mensaje</div>
+}
+
 @code {
     [Parameter] public int Id { get; set; }
     private Appointment? cita;
     private List<Client> clientes = new();
     private List<Artist> artistas = new();
+    private string? mensaje;
 
     protected override async Task OnInitializedAsync()
     {
-        cita = await Http.GetFromJsonAsync<Appointment>($"api/appointments/{Id}");
-        clientes = await Http.GetFromJsonAsync<List<Client>>("api/clients") ?? new();
-        artistas = await Http.GetFromJsonAsync<List<Artist>>("api/artists") ?? new();
+        var resultCita = await repository.GetAsync<Appointment>($"api/appointments/{Id}");
+        cita = resultCita.Response;
+        var resultClientes = await repository.GetAsync<List<Client>>("api/clients");
+        clientes = resultClientes.Response ?? new();
+        var resultArtistas = await repository.GetAsync<List<Artist>>("api/artists");
+        artistas = resultArtistas.Response ?? new();
     }
 
     async Task Guardar()
     {
-        await Http.PutAsJsonAsync($"api/appointments/{Id}", cita);
-        Nav.NavigateTo("/citas");
+        var result = await repository.PutAsync($"api/appointments/{Id}", cita);
+        if (result.Error)
+        {
+            mensaje = await result.GetErrorMessageAsync();
+        }
+        else
+        {
+            Nav.NavigateTo("/citas");
+        }
     }
 }

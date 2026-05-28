@@ -1,5 +1,5 @@
 ﻿@page "/disenos/crear"
-@inject HttpClient Http
+@inject IRepository repository
 @inject NavigationManager Nav
 
 <h3>Nuevo Diseño</h3>
@@ -40,18 +40,32 @@
     <a href="/disenos" class="btn btn-secondary ms-2">Cancelar</a>
 </EditForm>
 
+@if (mensaje != null)
+{
+    <div class="alert alert-danger">@mensaje</div>
+}
+
 @code {
     private Design diseno = new();
     private List<Artist> artistas = new();
+    private string? mensaje;
 
     protected override async Task OnInitializedAsync()
     {
-        artistas = await Http.GetFromJsonAsync<List<Artist>>("api/artists") ?? new();
+        var result = await repository.GetAsync<List<Artist>>("api/artists");
+        artistas = result.Response ?? new();
     }
 
     async Task Guardar()
     {
-        await Http.PostAsJsonAsync("api/designs", diseno);
-        Nav.NavigateTo("/disenos");
+        var result = await repository.PostAsync("api/designs", diseno);
+        if (result.Error)
+        {
+            mensaje = await result.GetErrorMessageAsync();
+        }
+        else
+        {
+            Nav.NavigateTo("/disenos");
+        }
     }
 }

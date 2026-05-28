@@ -1,5 +1,5 @@
 ﻿@page "/clientes"
-@inject HttpClient Http
+@inject IRepository repository
 @inject NavigationManager Nav
 
 <h3>Clientes</h3>
@@ -61,7 +61,8 @@ else
 
     async Task Cargar()
     {
-        lista = await Http.GetFromJsonAsync<List<Client>>("api/clients");
+        var result = await repository.GetAsync<List<Client>>("api/clients");
+        lista = result.Response;
     }
 
     async Task Eliminar(int id)
@@ -69,7 +70,7 @@ else
         var confirm = await JS.InvokeAsync<bool>("confirm", "¿Seguro que deseas eliminar este cliente?");
         if (confirm)
         {
-            await Http.DeleteAsync($"api/clients/{id}");
+            await repository.DeleteAsync($"api/clients/{id}");
             mensaje = "Cliente eliminado correctamente.";
             await Cargar();
         }

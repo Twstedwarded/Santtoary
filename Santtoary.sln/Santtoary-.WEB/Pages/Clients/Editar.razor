@@ -1,5 +1,5 @@
 ﻿@page "/clientes/editar/{Id:int}"
-@inject HttpClient Http
+@inject IRepository repository
 @inject NavigationManager Nav
 
 <h3>Editar Cliente</h3>
@@ -47,18 +47,32 @@ else
     </EditForm>
 }
 
+@if (mensaje != null)
+{
+    <div class="alert alert-danger">@mensaje</div>
+}
+
 @code {
     [Parameter] public int Id { get; set; }
     private Client? cliente;
+    private string? mensaje;
 
     protected override async Task OnInitializedAsync()
     {
-        cliente = await Http.GetFromJsonAsync<Client>($"api/clients/{Id}");
+        var result = await repository.GetAsync<Client>($"api/clients/{Id}");
+        cliente = result.Response;
     }
 
     async Task Guardar()
     {
-        await Http.PutAsJsonAsync($"api/clients/{Id}", cliente);
-        Nav.NavigateTo("/clientes");
+        var result = await repository.PutAsync($"api/clients/{Id}", cliente);
+        if (result.Error)
+        {
+            mensaje = await result.GetErrorMessageAsync();
+        }
+        else
+        {
+            Nav.NavigateTo("/clientes");
+        }
     }
-}
+}  

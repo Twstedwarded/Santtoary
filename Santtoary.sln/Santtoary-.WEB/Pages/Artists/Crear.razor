@@ -1,5 +1,5 @@
 ﻿@page "/artistas/crear"
-@inject HttpClient Http
+@inject IRepository repository
 @inject NavigationManager Nav
 
 <h3>Nuevo Artista</h3>
@@ -30,12 +30,25 @@
     <a href="/artistas" class="btn btn-secondary ms-2">Cancelar</a>
 </EditForm>
 
+@if (mensaje != null)
+{
+    <div class="alert alert-danger">@mensaje</div>
+}
+
 @code {
     private Artist artista = new();
+    private string? mensaje;
 
     async Task Guardar()
     {
-        await Http.PostAsJsonAsync("api/artists", artista);
-        Nav.NavigateTo("/artistas");
+        var result = await repository.PostAsync("api/artists", artista);
+        if (result.Error)
+        {
+            mensaje = await result.GetErrorMessageAsync();
+        }
+        else
+        {
+            Nav.NavigateTo("/artistas");
+        }
     }
 }

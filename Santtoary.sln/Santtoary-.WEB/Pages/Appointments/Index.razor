@@ -1,5 +1,5 @@
 ﻿@page "/citas"
-@inject HttpClient Http
+@inject IRepository repository
 @inject NavigationManager Nav
 
 <h3>Citas</h3>
@@ -65,7 +65,8 @@ else
 
     async Task Cargar()
     {
-        lista = await Http.GetFromJsonAsync<List<Appointment>>("api/appointments");
+        var result = await repository.GetAsync<List<Appointment>>("api/appointments");
+        lista = result.Response;
     }
 
     async Task Eliminar(int id)
@@ -73,7 +74,7 @@ else
         var confirm = await JS.InvokeAsync<bool>("confirm", "¿Seguro que deseas eliminar esta cita?");
         if (confirm)
         {
-            await Http.DeleteAsync($"api/appointments/{id}");
+            await repository.DeleteAsync($"api/appointments/{id}");
             mensaje = "Cita eliminada correctamente.";
             await Cargar();
         }
