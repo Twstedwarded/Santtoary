@@ -1,0 +1,110 @@
+﻿@page "/api/Users/ConfirmEmail"
+
+@inject HttpClient Http
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+
+<div class="login-page">
+    <div class="login-card" style="text-align: center;">
+
+        <div class="login-header">
+            <h1>Santtoary</h1>
+            <p>Confirmación de cuenta</p>
+        </div>
+
+        <p style="margin-bottom: 20px; color: #334155;">
+            Estás a un paso de activar tu cuenta. Presiona el botón para confirmar tu correo electrónico.
+        </p>
+
+        <button class="login-btn" @onclick="ConfirmAccountAsync">
+            Confirmar Cuenta
+        </button>
+
+    </div>
+</div>
+
+@code {
+    // Estas variables "atrapan" los datos larguísimos que vienen en el link del correo
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "userid")]
+    public string UserId { get; set; } = "";
+
+    [Parameter]
+    [SupplyParameterFromQuery(Name = "token")]
+    public string Token { get; set; } = "";
+
+    protected async Task ConfirmAccountAsync()
+    {
+        // Enviamos esos datos al controlador del API para que cambie el "EmailConfirmed" a True
+        var response = await Http.GetAsync($"api/users/ConfirmEmail?userId={UserId}&token={Token}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            // Si sale bien, mostramos alerta y mandamos al Login
+            await JS.InvokeVoidAsync("alert", "¡Gracias por confirmar tu email! Ahora puedes ingresar al sistema.");
+            Nav.NavigateTo("/login");
+        }
+        else
+        {
+            // Si algo falla (el token expiró, etc.)
+            var error = await response.Content.ReadAsStringAsync();
+            await JS.InvokeVoidAsync("alert", $"Hubo un problema: {error}");
+            Nav.NavigateTo("/login");
+        }
+    }
+}
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .login-page {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+    }
+
+    .login-card {
+        width: 380px;
+        background: white;
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .login-header h1 {
+        margin: 0;
+        font-size: 32px;
+        color: #0f172a;
+    }
+
+    .login-header p {
+        color: gray;
+        margin-top: 10px;
+    }
+
+    .login-btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: 12px;
+        background: #2563eb;
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .login-btn:hover {
+            background: #1d4ed8;
+        }
+</style>

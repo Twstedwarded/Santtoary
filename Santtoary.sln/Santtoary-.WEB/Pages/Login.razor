@@ -52,6 +52,10 @@
             <a href="/register">Crear cuenta</a>
         </div>
 
+        <div class="register-link" style="margin-top: 10px;">
+            <a href="/ResendToken">Reenviar correo de activación</a>
+        </div>
+
     </div>
 </div>
 
@@ -75,8 +79,8 @@
         }
         else
         {
-            // Si llega aquí, es porque falló (BadRequest)
-            mensajeError = "Usuario o contraseña incorrectos.";
+            // Leemos el mensaje exacto que nos envía el API (ej: "Cuenta no confirmada")
+            mensajeError = await response.Content.ReadAsStringAsync();
         }
     }
 }
