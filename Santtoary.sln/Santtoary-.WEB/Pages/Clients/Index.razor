@@ -1,15 +1,16 @@
-﻿@page "/clientes"
-@inject HttpClient Http
-@inject NavigationManager Nav
+﻿@page "/clients"
+@inject IRepository repository
+@inject NavigationManager navigationManager
 
 <h3>Clientes</h3>
-<a href="/clientes/crear" class="btn btn-primary mb-3">+ Nuevo Cliente</a>
 
-@if (lista == null)
+<a href="/clients/crear" class="btn btn-primary mb-3">Nuevo Cliente</a>
+
+@if (clients == null)
 {
     <p>Cargando...</p>
 }
-else if (!lista.Any())
+else if (!clients.Any())
 {
     <p>No hay clientes registrados.</p>
 }
@@ -26,16 +27,16 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in lista)
+            @foreach (var client in clients)
             {
                 <tr>
-                    <td>@item.Name</td>
-                    <td>@item.Document</td>
-                    <td>@item.Phone</td>
-                    <td>@item.Email</td>
+                    <td>@client.Name</td>
+                    <td>@client.Document</td>
+                    <td>@client.Phone</td>
+                    <td>@client.Email</td>
                     <td>
-                        <a href="/clientes/editar/@item.Id" class="btn btn-warning btn-sm">Editar</a>
-                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)">Eliminar</button>
+                        <a href="/clients/editar/@client.Id" class="btn btn-warning btn-sm">Editar</a>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Delete(client.Id)">Eliminar</button>
                     </td>
                 </tr>
             }
@@ -43,35 +44,24 @@ else
     </table>
 }
 
-@if (mensaje != null)
-{
-    <div class="alert alert-info">@mensaje</div>
-}
-
 @code {
-    private List<Client>? lista;
-    private string? mensaje;
-
-    [Inject] IJSRuntime JS { get; set; } = default!;
+    private List<Client>? clients;
 
     protected override async Task OnInitializedAsync()
     {
-        await Cargar();
-    }
-
-    async Task Cargar()
-    {
-        lista = await Http.GetFromJsonAsync<List<Client>>("api/clients");
-    }
-
-    async Task Eliminar(int id)
-    {
-        var confirm = await JS.InvokeAsync<bool>("confirm", "¿Seguro que deseas eliminar este cliente?");
-        if (confirm)
+        var result = await repository.GetAsync<List<Client>>("api/clients");
+        if (!result.Error)
         {
-            await Http.DeleteAsync($"api/clients/{id}");
-            mensaje = "Cliente eliminado correctamente.";
-            await Cargar();
+            clients = result.Response;
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        var result = await repository.DeleteAsync($"api/clients/{id}");
+        if (!result.Error)
+        {
+            await OnInitializedAsync();
         }
     }
 }

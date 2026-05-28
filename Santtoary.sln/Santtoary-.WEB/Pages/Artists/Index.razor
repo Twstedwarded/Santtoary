@@ -1,15 +1,16 @@
-﻿@page "/artistas"
-@inject HttpClient Http
-@inject NavigationManager Nav
+﻿@page "/artists"
+@inject IRepository repository
+@inject NavigationManager navigationManager
 
 <h3>Artistas</h3>
-<a href="/artistas/crear" class="btn btn-primary mb-3">+ Nuevo Artista</a>
 
-@if (lista == null)
+<a href="/artists/crear" class="btn btn-primary mb-3">Nuevo Artista</a>
+
+@if (artists == null)
 {
     <p>Cargando...</p>
 }
-else if (!lista.Any())
+else if (!artists.Any())
 {
     <p>No hay artistas registrados.</p>
 }
@@ -25,15 +26,15 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in lista)
+            @foreach (var artist in artists)
             {
                 <tr>
-                    <td>@item.Name</td>
-                    <td>@item.Specialty</td>
-                    <td>@item.PhoneNumber</td>
+                    <td>@artist.Name</td>
+                    <td>@artist.Specialty</td>
+                    <td>@artist.PhoneNumber</td>
                     <td>
-                        <a href="/artistas/editar/@item.Id" class="btn btn-warning btn-sm">Editar</a>
-                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)">Eliminar</button>
+                        <a href="/artists/editar/@artist.Id" class="btn btn-warning btn-sm">Editar</a>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Delete(artist.Id)">Eliminar</button>
                     </td>
                 </tr>
             }
@@ -41,35 +42,24 @@ else
     </table>
 }
 
-@if (mensaje != null)
-{
-    <div class="alert alert-info">@mensaje</div>
-}
-
 @code {
-    private List<Artist>? lista;
-    private string? mensaje;
-
-    [Inject] IJSRuntime JS { get; set; } = default!;
+    private List<Artist>? artists;
 
     protected override async Task OnInitializedAsync()
     {
-        await Cargar();
-    }
-
-    async Task Cargar()
-    {
-        lista = await Http.GetFromJsonAsync<List<Artist>>("api/artists");
-    }
-
-    async Task Eliminar(int id)
-    {
-        var confirm = await JS.InvokeAsync<bool>("confirm", "¿Seguro que deseas eliminar este artista?");
-        if (confirm)
+        var result = await repository.GetAsync<List<Artist>>("api/artists");
+        if (!result.Error)
         {
-            await Http.DeleteAsync($"api/artists/{id}");
-            mensaje = "Artista eliminado correctamente.";
-            await Cargar();
+            artists = result.Response;
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        var result = await repository.DeleteAsync($"api/artists/{id}");
+        if (!result.Error)
+        {
+            await OnInitializedAsync();
         }
     }
 }

@@ -1,51 +1,50 @@
-﻿@page "/clientes/crear"
-@inject HttpClient Http
-@inject NavigationManager Nav
+﻿@page "/clients/crear"
+@inject IRepository repository
+@inject NavigationManager navigationManager
 
 <h3>Nuevo Cliente</h3>
 
-<EditForm Model="cliente" OnValidSubmit="Guardar">
+<EditForm Model="client" OnValidSubmit="Save">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="mb-3">
-        <label>Nombre *</label>
-        <InputText class="form-control" @bind-Value="cliente.Name" />
-        <ValidationMessage For="@(() => cliente.Name)" />
+        <label>Nombre</label>
+        <InputText class="form-control" @bind-Value="client.Name" />
+        <ValidationMessage For="@(() => client.Name)" />
     </div>
-
     <div class="mb-3">
-        <label>Documento *</label>
-        <InputText class="form-control" @bind-Value="cliente.Document" />
-        <ValidationMessage For="@(() => cliente.Document)" />
+        <label>Documento</label>
+        <InputText class="form-control" @bind-Value="client.Document" />
+        <ValidationMessage For="@(() => client.Document)" />
     </div>
-
     <div class="mb-3">
         <label>Teléfono</label>
-        <InputText class="form-control" @bind-Value="cliente.Phone" />
+        <InputText class="form-control" @bind-Value="client.Phone" />
     </div>
-
     <div class="mb-3">
         <label>Email</label>
-        <InputText class="form-control" @bind-Value="cliente.Email" />
-        <ValidationMessage For="@(() => cliente.Email)" />
+        <InputText class="form-control" @bind-Value="client.Email" />
+        <ValidationMessage For="@(() => client.Email)" />
     </div>
-
     <div class="mb-3">
-        <label>Notas Médicas</label>
-        <InputTextArea class="form-control" @bind-Value="cliente.MedicalNotes" rows="3" />
+        <label>Notas médicas</label>
+        <InputTextArea class="form-control" @bind-Value="client.MedicalNotes" />
     </div>
 
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a href="/clientes" class="btn btn-secondary ms-2">Cancelar</a>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="/clients" class="btn btn-secondary ms-2">Cancelar</a>
 </EditForm>
 
 @code {
-    private Client cliente = new();
+    private Client client = new();
 
-    async Task Guardar()
+    private async Task Save()
     {
-        await Http.PostAsJsonAsync("api/clients", cliente);
-        Nav.NavigateTo("/clientes");
+        var result = await repository.PostAsync("api/clients", client);
+        if (!result.Error)
+        {
+            navigationManager.NavigateTo("/clients");
+        }
     }
 }

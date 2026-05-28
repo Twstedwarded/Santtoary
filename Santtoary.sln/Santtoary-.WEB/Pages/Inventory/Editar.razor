@@ -1,64 +1,58 @@
-﻿@page "/inventario/editar/{id:int}"
-@using Santtoary.Shared.Entidades
-@inject HttpClient Http
-@inject NavigationManager Nav
+﻿@page "/inventory/editar/{Id:int}"
+@inject IRepository repository
+@inject NavigationManager navigationManager
 
-<h3>Editar Insumo</h3>
+<h3>Editar Item</h3>
 
-<EditForm Model="item" OnValidSubmit="Guardar">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+@if (item == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <EditForm Model="item" OnValidSubmit="Save">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-    <div class="mb-3">
-        <label>Nombre del insumo *</label>
-        <InputText class="form-control" @bind-Value="item.Name" />
-        <ValidationMessage For="@(() => item.Name)" />
-    </div>
+        <div class="mb-3">
+            <label>Nombre</label>
+            <InputText class="form-control" @bind-Value="item.Name" />
+            <ValidationMessage For="@(() => item.Name)" />
+        </div>
+        <div class="mb-3">
+            <label>Cantidad</label>
+            <InputNumber class="form-control" @bind-Value="item.Quantity" />
+            <ValidationMessage For="@(() => item.Quantity)" />
+        </div>
+        <div class="mb-3">
+            <label>Stock mínimo</label>
+            <InputNumber class="form-control" @bind-Value="item.MinimumStockLevel" />
+        </div>
 
-    <div class="mb-3">
-        <label>Cantidad *</label>
-        <InputNumber class="form-control" @bind-Value="item.Quantity" />
-        <ValidationMessage For="@(() => item.Quantity)" />
-    </div>
-
-    <div class="mb-3">
-        <label>Stock Mínimo</label>
-        <InputNumber class="form-control" @bind-Value="item.MinimumStockLevel" />
-    </div>
-
-    <button type="submit" class="btn btn-success">Guardar Cambios</button>
-    <a href="/inventario" class="btn btn-secondary ms-2">Cancelar</a>
-</EditForm>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="/inventory" class="btn btn-secondary ms-2">Cancelar</a>
+    </EditForm>
+}
 
 @code {
-    // 1. LA PUERTA PARA RECIBIR EL ID DE LA URL
-    [Parameter]
-    public int id { get; set; }
+    [Parameter] public int Id { get; set; }
+    private InventoryItem? item;
 
-    private InventoryItem item = new();
-
-    // 2. ESTE MÉTODO CARGA LOS DATOS APENAS ENTRAS A LA PÁGINA
     protected override async Task OnInitializedAsync()
     {
-        var response = await Http.GetFromJsonAsync<InventoryItem>($"api/inventoryitems/{id}");
-        if (response != null)
+        var result = await repository.GetAsync<InventoryItem>($"api/inventoryitems/{Id}");
+        if (!result.Error)
         {
-            item = response;
+            item = result.Response;
         }
     }
 
-    // 3. CAMBIAMOS POST POR PUT PARA ACTUALIZAR
-    async Task Guardar()
+    private async Task Save()
     {
-        var response = await Http.PutAsJsonAsync($"api/inventoryitems/{id}", item);
-
-        if (response.IsSuccessStatusCode)
+        var result = await repository.PutAsync($"api/inventoryitems/{Id}", item);
+        if (!result.Error)
         {
-            Nav.NavigateTo("/inventario");
-        }
-        else
-        {
-            
+            navigationManager.NavigateTo("/inventory");
         }
     }
 }

@@ -1,57 +1,65 @@
-﻿@page "/disenos/crear"
-@inject HttpClient Http
-@inject NavigationManager Nav
+﻿@page "/designs/crear"
+@inject IRepository repository
+@inject NavigationManager navigationManager
 
 <h3>Nuevo Diseño</h3>
 
-<EditForm Model="diseno" OnValidSubmit="Guardar">
+<EditForm Model="design" OnValidSubmit="Save">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="mb-3">
-        <label>Título *</label>
-        <InputText class="form-control" @bind-Value="diseno.Title" />
-        <ValidationMessage For="@(() => diseno.Title)" />
+        <label>Título</label>
+        <InputText class="form-control" @bind-Value="design.Title" />
+        <ValidationMessage For="@(() => design.Title)" />
     </div>
-
     <div class="mb-3">
         <label>URL de imagen</label>
-        <InputText class="form-control" @bind-Value="diseno.ImageUrl" />
+        <InputText class="form-control" @bind-Value="design.ImageUrl" />
     </div>
-
     <div class="mb-3">
-        <label>Precio *</label>
-        <InputNumber class="form-control" @bind-Value="diseno.Price" />
-        <ValidationMessage For="@(() => diseno.Price)" />
+        <label>Precio</label>
+        <InputNumber class="form-control" @bind-Value="design.Price" />
+        <ValidationMessage For="@(() => design.Price)" />
     </div>
-
     <div class="mb-3">
-        <label>Artista *</label>
-        <InputSelect class="form-control" @bind-Value="diseno.ArtistId">
+        <label>Artista</label>
+        <InputSelect class="form-control" @bind-Value="design.ArtistId">
             <option value="">-- Seleccione un artista --</option>
-            @foreach (var artista in artistas)
+            @if (artists != null)
             {
-                <option value="@artista.Id">@artista.Name</option>
+                @foreach (var artist in artists)
+                {
+                    <option value="@artist.Id">@artist.Name</option>
+                }
             }
         </InputSelect>
+        <ValidationMessage For="@(() => design.ArtistId)" />
     </div>
 
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a href="/disenos" class="btn btn-secondary ms-2">Cancelar</a>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="/designs" class="btn btn-secondary ms-2">Cancelar</a>
 </EditForm>
 
 @code {
-    private Design diseno = new();
-    private List<Artist> artistas = new();
+    private Design design = new();
+    private List<Artist>? artists;
 
     protected override async Task OnInitializedAsync()
     {
-        artistas = await Http.GetFromJsonAsync<List<Artist>>("api/artists") ?? new();
+        var result = await repository.GetAsync<List<Artist>>("api/artists");
+        if (!result.Error)
+        {
+            artists = result.Response;
+        }
     }
 
-    async Task Guardar()
+    private async Task Save()
     {
-        await Http.PostAsJsonAsync("api/designs", diseno);
-        Nav.NavigateTo("/disenos");
+        var result = await repository.PostAsync("api/designs", design);
+        if (!result.Error)
+        {
+            navigationManager.NavigateTo("/designs");
+        }
     }
 }

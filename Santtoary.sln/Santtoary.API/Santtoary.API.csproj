@@ -9,9 +9,11 @@
   <ItemGroup>
     
     <PackageReference Include="MailKit" Version="4.17.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.8" />
     
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.7" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
+    
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7">
       <PrivateAssets>all</PrivateAssets>
@@ -24,6 +26,7 @@
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.1.7" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.1.7" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />
   </ItemGroup>
 

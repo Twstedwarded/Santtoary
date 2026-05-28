@@ -1,41 +1,42 @@
-﻿@page "/artistas/crear"
-@inject HttpClient Http
-@inject NavigationManager Nav
+﻿@page "/artists/crear"
+@inject IRepository repository
+@inject NavigationManager navigationManager
 
 <h3>Nuevo Artista</h3>
 
-<EditForm Model="artista" OnValidSubmit="Guardar">
+<EditForm Model="artist" OnValidSubmit="Save">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="mb-3">
-        <label>Nombre *</label>
-        <InputText class="form-control" @bind-Value="artista.Name" />
-        <ValidationMessage For="@(() => artista.Name)" />
+        <label>Nombre</label>
+        <InputText class="form-control" @bind-Value="artist.Name" />
+        <ValidationMessage For="@(() => artist.Name)" />
     </div>
-
     <div class="mb-3">
-        <label>Especialidad *</label>
-        <InputText class="form-control" @bind-Value="artista.Specialty" />
-        <ValidationMessage For="@(() => artista.Specialty)" />
+        <label>Especialidad</label>
+        <InputText class="form-control" @bind-Value="artist.Specialty" />
+        <ValidationMessage For="@(() => artist.Specialty)" />
     </div>
-
     <div class="mb-3">
         <label>Teléfono</label>
-        <InputText class="form-control" @bind-Value="artista.PhoneNumber" />
-        <ValidationMessage For="@(() => artista.PhoneNumber)" />
+        <InputText class="form-control" @bind-Value="artist.PhoneNumber" />
+        <ValidationMessage For="@(() => artist.PhoneNumber)" />
     </div>
 
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a href="/artistas" class="btn btn-secondary ms-2">Cancelar</a>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="/artists" class="btn btn-secondary ms-2">Cancelar</a>
 </EditForm>
 
 @code {
-    private Artist artista = new();
+    private Artist artist = new();
 
-    async Task Guardar()
+    private async Task Save()
     {
-        await Http.PostAsJsonAsync("api/artists", artista);
-        Nav.NavigateTo("/artistas");
+        var result = await repository.PostAsync("api/artists", artist);
+        if (!result.Error)
+        {
+            navigationManager.NavigateTo("/artists");
+        }
     }
 }

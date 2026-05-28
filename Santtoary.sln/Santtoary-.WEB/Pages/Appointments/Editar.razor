@@ -1,92 +1,101 @@
-﻿@page "/citas/editar/{Id:int}"
-@inject HttpClient Http
-@inject NavigationManager Nav
+﻿@page "/appointments/editar/{Id:int}"
+@inject IRepository repository
+@inject NavigationManager navigationManager
 
 <h3>Editar Cita</h3>
 
-@if (cita == null)
+@if (appointment == null)
 {
     <p>Cargando...</p>
 }
 else
 {
-    <EditForm Model="cita" OnValidSubmit="Guardar">
+    <EditForm Model="appointment" OnValidSubmit="Save">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
         <div class="mb-3">
-            <label>Fecha *</label>
-            <InputDate class="form-control" @bind-Value="cita.Date" />
-            <ValidationMessage For="@(() => cita.Date)" />
+            <label>Fecha</label>
+            <InputDate Type="InputDateType.DateTimeLocal" class="form-control" @bind-Value="appointment.Date" />
+            <ValidationMessage For="@(() => appointment.Date)" />
         </div>
-
         <div class="mb-3">
-            <label>Horas estimadas *</label>
-            <InputNumber class="form-control" @bind-Value="cita.EstimatedHours" />
-            <ValidationMessage For="@(() => cita.EstimatedHours)" />
+            <label>Cliente</label>
+            <InputSelect class="form-control" @bind-Value="appointment.ClientId">
+                <option value="">-- Seleccione un cliente --</option>
+                @if (clients != null)
+                {
+                    @foreach (var client in clients)
+                    {
+                        <option value="@client.Id">@client.Name</option>
+                    }
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => appointment.ClientId)" />
         </div>
-
         <div class="mb-3">
-            <label>Precio total *</label>
-            <InputNumber class="form-control" @bind-Value="cita.TotalPrice" />
-            <ValidationMessage For="@(() => cita.TotalPrice)" />
+            <label>Artista</label>
+            <InputSelect class="form-control" @bind-Value="appointment.ArtistId">
+                <option value="">-- Seleccione un artista --</option>
+                @if (artists != null)
+                {
+                    @foreach (var artist in artists)
+                    {
+                        <option value="@artist.Id">@artist.Name</option>
+                    }
+                }
+            </InputSelect>
+            <ValidationMessage For="@(() => appointment.ArtistId)" />
         </div>
-
         <div class="mb-3">
-            <label>Estado *</label>
-            <InputSelect class="form-control" @bind-Value="cita.Status">
-                <option value="">-- Seleccione un estado --</option>
+            <label>Horas estimadas</label>
+            <InputNumber class="form-control" @bind-Value="appointment.EstimatedHours" />
+            <ValidationMessage For="@(() => appointment.EstimatedHours)" />
+        </div>
+        <div class="mb-3">
+            <label>Precio total</label>
+            <InputNumber class="form-control" @bind-Value="appointment.TotalPrice" />
+            <ValidationMessage For="@(() => appointment.TotalPrice)" />
+        </div>
+        <div class="mb-3">
+            <label>Estado</label>
+            <InputSelect class="form-control" @bind-Value="appointment.Status">
                 <option value="Pendiente">Pendiente</option>
                 <option value="Confirmada">Confirmada</option>
-                <option value="Completada">Completada</option>
                 <option value="Cancelada">Cancelada</option>
             </InputSelect>
-            <ValidationMessage For="@(() => cita.Status)" />
+            <ValidationMessage For="@(() => appointment.Status)" />
         </div>
 
-        <div class="mb-3">
-            <label>Cliente *</label>
-            <InputSelect class="form-control" @bind-Value="cita.ClientId">
-                <option value="">-- Seleccione un cliente --</option>
-                @foreach (var cliente in clientes)
-                {
-                    <option value="@cliente.Id">@cliente.Name</option>
-                }
-            </InputSelect>
-        </div>
-
-        <div class="mb-3">
-            <label>Artista *</label>
-            <InputSelect class="form-control" @bind-Value="cita.ArtistId">
-                <option value="">-- Seleccione un artista --</option>
-                @foreach (var artista in artistas)
-                {
-                    <option value="@artista.Id">@artista.Name</option>
-                }
-            </InputSelect>
-        </div>
-
-        <button type="submit" class="btn btn-success">Guardar cambios</button>
-        <a href="/citas" class="btn btn-secondary ms-2">Cancelar</a>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="/appointments" class="btn btn-secondary ms-2">Cancelar</a>
     </EditForm>
 }
 
 @code {
     [Parameter] public int Id { get; set; }
-    private Appointment? cita;
-    private List<Client> clientes = new();
-    private List<Artist> artistas = new();
+    private Appointment? appointment;
+    private List<Client>? clients;
+    private List<Artist>? artists;
 
     protected override async Task OnInitializedAsync()
     {
-        cita = await Http.GetFromJsonAsync<Appointment>($"api/appointments/{Id}");
-        clientes = await Http.GetFromJsonAsync<List<Client>>("api/clients") ?? new();
-        artistas = await Http.GetFromJsonAsync<List<Artist>>("api/artists") ?? new();
+        var resultAppointment = await repository.GetAsync<Appointment>($"api/appointments/{Id}");
+        if (!resultAppointment.Error) appointment = resultAppointment.Response;
+
+        var resultClients = await repository.GetAsync<List<Client>>("api/clients");
+        if (!resultClients.Error) clients = resultClients.Response;
+
+        var resultArtists = await repository.GetAsync<List<Artist>>("api/artists");
+        if (!resultArtists.Error) artists = resultArtists.Response;
     }
 
-    async Task Guardar()
+    private async Task Save()
     {
-        await Http.PutAsJsonAsync($"api/appointments/{Id}", cita);
-        Nav.NavigateTo("/citas");
+        var result = await repository.PutAsync($"api/appointments/{Id}", appointment);
+        if (!result.Error)
+        {
+            navigationManager.NavigateTo("/appointments");
+        }
     }
 }
