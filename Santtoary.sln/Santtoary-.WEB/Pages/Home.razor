@@ -4,7 +4,6 @@
 
 <div class="home">
 
-    <!-- HERO -->
     <div class="hero" style="background-image: url('/fondo.png');">
         <div class="hero-overlay">
             <div class="hero-mark">✦</div>
@@ -12,12 +11,10 @@
             <p class="hero-sub">Tattoo • Barber • Style • Medellín</p>
             <div class="auth-buttons">
                 <button class="btn-hero login" @onclick="GoLogin">Iniciar Sesión</button>
-                <button class="btn-hero register" @onclick="GoRegister">Registro</button>
             </div>
         </div>
     </div>
 
-    <!-- ABOUT -->
     <section class="about">
         <div class="section-mark">✦</div>
         <h2>Estilo masculino, arte en la piel</h2>
@@ -27,7 +24,6 @@
         </p>
     </section>
 
-    <!-- ARTISTS -->
     <section class="artists">
         <div class="section-mark">✦</div>
         <h2>Artistas & Barberos</h2>
@@ -56,14 +52,12 @@
         </div>
     </section>
 
-    <!-- LOCATION -->
     <section class="location">
         <div class="section-mark">✦</div>
         <h2>Medellín, Colombia</h2>
         <p>El Poblado · Estudio privado · Solo con cita previa</p>
     </section>
 
-    <!-- FOOTER -->
     <footer class="footer">
         <h3>✦ Santtoary</h3>
         <p>Tattoo & Barber Studio</p>
@@ -74,12 +68,10 @@
         </div>
         <p class="copy">© 2026 Santtoary. Todos los derechos reservados.</p>
     </footer>
-
 </div>
 
 @code {
     private void GoLogin() => Nav.NavigateTo("/login");
-    private void GoRegister() => Nav.NavigateTo("/register");
 }
 
 <style>
@@ -184,19 +176,6 @@
         border-color: #e8c96e !important;
     }
 
-    .register,
-    .register:focus,
-    .register:active {
-        background: transparent !important;
-        border: 1px solid #c9a84c55 !important;
-        color: #c9a84c !important;
-    }
-
-    .register:hover {
-        background: #c9a84c11 !important;
-        border-color: #c9a84c !important;
-    }
-
     /* SECTION MARK */
     .section-mark {
         color: #c9a84c44;
@@ -225,7 +204,7 @@
     .about p {
         max-width: 600px;
         margin: auto;
-        color: #555;
+        color: #a3a3a3; 
         line-height: 1.9;
         font-size: 0.95rem;
     }
@@ -291,7 +270,7 @@
     }
 
     .artist-info p {
-        color: #444;
+        color: #999;
         font-size: 0.82rem;
         margin: 0;
     }
@@ -313,7 +292,7 @@
     }
 
     .location p {
-        color: #444;
+        color: #999;
         letter-spacing: 0.1em;
         font-size: 0.88rem;
     }
@@ -335,7 +314,7 @@
     }
 
     .footer p {
-        color: #333;
+        color: #888; 
         font-size: 0.85rem;
     }
 
@@ -358,7 +337,7 @@
 
     .copy {
         font-size: 0.75rem;
-        color: #222;
+        color: #555; 
         margin-top: 1.5rem;
     }
 </style>

@@ -2,9 +2,11 @@
 @layout EmptyLayout
 @using Microsoft.AspNetCore.Components.Forms
 @using Santtoary.Shared.DTOs
+@using Santtoary_.WEB.Auth
 @inject NavigationManager Nav
 @inject IHttpClientFactory ClientFactory
 @inject IJSRuntime JSRuntime
+@inject ILoginService LoginService
 
 <div class="auth-page">
     <div class="auth-card">
@@ -40,13 +42,12 @@
             ¿No tienes cuenta? <a href="/register">Crear cuenta</a>
         </div>
 
-        <div class="register-link" style="margin-top: 10px;">
+        <div class="register-link" style="margin-top: 15px; text-align: center;">
             <a href="/ResendToken">Reenviar correo de activación</a>
         </div>
 
     </div>
 </div>
-
 @code {
     LoginDTO loginModel = new();
     private string? mensajeError;
@@ -57,28 +58,23 @@
 
         try
         {
-            // Instanciamos el cliente específico que contiene el AuthorizationMessageHandler
             var Http = ClientFactory.CreateClient("Santtoary.API");
-
-            // El API nos devuelve el token como un string si las credenciales son correctas
             var response = await Http.PostAsJsonAsync("api/users/login", loginModel);
 
             if (response.IsSuccessStatusCode)
             {
-                // 1. Leemos el token que el API nos envía
                 var token = await response.Content.ReadAsStringAsync();
-
-                // 2. Guardamos el token en el almacenamiento local del navegador
-                await JSRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", token);
-
-                // 3. Navegamos al panel
+                // CAMBIO: usar LoginService en vez de localStorage directo
+                // Esto guarda con TOKEN_KEY Y notifica a Blazor del cambio de estado
+                await LoginService.LoginAsync(token);
                 Nav.NavigateTo("/panel");
             }
             else
             {
-                // Si el API devuelve un error (ej: 400), leemos el mensaje de error del servidor
                 var errorContent = await response.Content.ReadAsStringAsync();
-                mensajeError = string.IsNullOrEmpty(errorContent) ? "Usuario o contraseña incorrectos." : errorContent;
+                mensajeError = string.IsNullOrEmpty(errorContent)
+                    ? "Usuario o contraseña incorrectos."
+                    : errorContent;
             }
         }
         catch (Exception ex)
@@ -87,6 +83,8 @@
         }
     }
 }
+
+
 
 <style>
     .auth-page {
@@ -102,10 +100,10 @@
     .auth-card {
         width: 400px;
         background: #111;
-        border: 1px solid #1e1e1e;
+        border: 1px solid #222; 
         padding: 3rem 2.5rem;
         border-radius: 8px;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
     }
 
     .auth-header {
@@ -117,7 +115,7 @@
         color: #c9a84c;
         font-size: 1.2rem;
         margin-bottom: 0.75rem;
-        opacity: 0.6;
+        opacity: 0.8; 
         letter-spacing: 0.5em;
     }
 
@@ -131,16 +129,16 @@
     }
 
     .auth-header p {
-        color: #444;
-        font-size: 0.85rem;
+        color: #b3b3b3; 
+        font-size: 0.9rem;
         margin: 0;
         letter-spacing: 0.03em;
     }
 
     .error-msg {
         background: #1a0a0a;
-        border: 1px solid #7a1a1a44;
-        color: #ef5350;
+        border: 1px solid #ef5350; 
+        color: #ff8a80; 
         padding: 0.75rem 1rem;
         border-radius: 4px;
         margin-bottom: 1.5rem;
@@ -157,7 +155,7 @@
             margin-bottom: 0.5rem;
             font-size: 0.8rem;
             font-weight: 600;
-            color: #555;
+            color: #c9a84c; 
             letter-spacing: 0.06em;
             text-transform: uppercase;
         }
@@ -165,24 +163,24 @@
     .input {
         width: 100%;
         padding: 0.85rem 1rem;
-        border: 1px solid #222;
+        border: 1px solid #333; 
         border-radius: 4px;
         background: #0d0d0d;
-        color: #e0e0e0;
+        color: #fff; 
         font-size: 0.9rem;
         font-family: 'Raleway', sans-serif;
         outline: none;
-        transition: border-color 0.2s ease;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
         box-sizing: border-box;
     }
 
         .input:focus {
             border-color: #c9a84c;
-            box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.1);
+            box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.2);
         }
 
         .input::placeholder {
-            color: #333;
+            color: #777; 
         }
 
     .auth-btn {
@@ -204,12 +202,13 @@
 
         .auth-btn:hover {
             background: #e8c96e;
+            box-shadow: 0 5px 15px rgba(201, 168, 76, 0.3);
         }
 
     .auth-footer-link {
         margin-top: 1.5rem;
         text-align: center;
-        color: #444;
+        color: #b3b3b3;
         font-size: 0.85rem;
     }
 
@@ -217,5 +216,22 @@
             color: #c9a84c;
             text-decoration: none;
             font-weight: 600;
+            margin-left: 5px;
+            transition: color 0.2s ease;
+        }
+
+            .auth-footer-link a:hover {
+                color: #e8c96e;
+            }
+
+    .register-link a {
+        color: #888; 
+        text-decoration: none;
+        font-size: 0.8rem;
+        transition: color 0.2s ease;
+    }
+
+        .register-link a:hover {
+            color: #c9a84c;
         }
 </style>

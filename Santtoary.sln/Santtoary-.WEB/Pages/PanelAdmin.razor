@@ -2,55 +2,55 @@
 @inject NavigationManager Nav
 
 <div class="container text-center" style="margin-top: 60px; margin-bottom: 60px;">
-    <h1 class="display-4 font-weight-bold mb-3" style="color: #e5e7eb;">Panel de Administración</h1>
-    <p class="lead mb-5" style="color: #94a3b8;">Bienvenido Admin. ¿Qué deseas gestionar hoy?</p>
+    <h1 class="display-4 font-weight-bold mb-3" style="color: #e5e7eb; font-family: 'Cinzel', serif;">Panel de Administración</h1>
+    <p class="lead mb-5" style="color: #c9a84c;">Bienvenido Admin. ¿Qué deseas gestionar hoy?</p>
 
     <div class="row justify-content-center gap-4">
-        <div class="card bg-dark border-secondary col-md-3" style="border-radius: 15px;">
+        <div class="card card-santtoary col-md-3">
             <div class="card-body d-flex flex-column p-4">
                 <h3 class="card-title text-white">📅 Citas</h3>
-                <p class="card-text text-secondary mb-4">Agenda, edita o cancela las citas del estudio.</p>
-                <button class="btn btn-primary mt-auto fw-bold" @onclick='() => Nav.NavigateTo("/appointments")'>Gestionar Citas</button>
+                <p class="card-text text-light mb-4">Agenda, edita o cancela las citas del estudio.</p>
+                <button class="btn btn-santtoary mt-auto fw-bold" @onclick='() => Nav.NavigateTo("/appointments")'>Gestionar Citas</button>
             </div>
         </div>
 
-        <div class="card bg-dark border-secondary col-md-3" style="border-radius: 15px;">
+        <div class="card card-santtoary col-md-3">
             <div class="card-body d-flex flex-column p-4">
                 <h3 class="card-title text-white">🎨 Artistas</h3>
-                <p class="card-text text-secondary mb-4">Administra el equipo de tatuadores y barberos.</p>
-                <button class="btn btn-success mt-auto fw-bold" @onclick='() => Nav.NavigateTo("/artists")'>Gestionar Artistas</button>
+                <p class="card-text text-light mb-4">Administra el equipo de tatuadores y barberos.</p>
+                <button class="btn btn-santtoary mt-auto fw-bold" @onclick='() => Nav.NavigateTo("/artists")'>Gestionar Artistas</button>
             </div>
         </div>
 
-        <div class="card bg-dark border-secondary col-md-3" style="border-radius: 15px;">
+        <div class="card card-santtoary col-md-3">
             <div class="card-body d-flex flex-column p-4">
                 <h3 class="card-title text-white">👥 Clientes</h3>
-                <p class="card-text text-secondary mb-4">Directorio de clientes y su historial médico.</p>
-                <button class="btn btn-info mt-auto fw-bold text-white" @onclick='() => Nav.NavigateTo("/clients")'>Gestionar Clientes</button>
+                <p class="card-text text-light mb-4">Directorio de clientes y su historial médico.</p>
+                <button class="btn btn-santtoary mt-auto fw-bold" @onclick='() => Nav.NavigateTo("/clients")'>Gestionar Clientes</button>
             </div>
         </div>
 
-        <div class="card bg-dark border-secondary col-md-3 mt-3" style="border-radius: 15px;">
+        <div class="card card-santtoary col-md-3 mt-3">
             <div class="card-body d-flex flex-column p-4">
                 <h3 class="card-title text-white">🖼️ Diseños</h3>
-                <p class="card-text text-secondary mb-4">Catálogo de tatuajes, estilos y plantillas.</p>
-                <button class="btn btn-warning mt-auto fw-bold text-dark" @onclick='() => Nav.NavigateTo("/designs")'>Gestionar Diseños</button>
+                <p class="card-text text-light mb-4">Catálogo de tatuajes, estilos y plantillas.</p>
+                <button class="btn btn-santtoary mt-auto fw-bold" @onclick='() => Nav.NavigateTo("/designs")'>Gestionar Diseños</button>
             </div>
         </div>
 
-        <div class="card bg-dark border-secondary col-md-3 mt-3" style="border-radius: 15px;">
+        <div class="card card-santtoary col-md-3 mt-3">
             <div class="card-body d-flex flex-column p-4">
                 <h3 class="card-title text-white">📦 Inventario</h3>
-                <p class="card-text text-secondary mb-4">Control de insumos, tintas y materiales.</p>
-                <button class="btn btn-danger mt-auto fw-bold" @onclick='() => Nav.NavigateTo("/inventory")'>Gestionar Inventario</button>
+                <p class="card-text text-light mb-4">Control de insumos, tintas y materiales.</p>
+                <button class="btn btn-santtoary mt-auto fw-bold" @onclick='() => Nav.NavigateTo("/inventory")'>Gestionar Inventario</button>
             </div>
         </div>
 
-        <div class="card bg-dark border-secondary col-md-3 mt-3" style="border-radius: 15px;">
+        <div class="card card-santtoary col-md-3 mt-3">
             <div class="card-body d-flex flex-column p-4">
                 <h3 class="card-title text-white">🔑 Usuarios</h3>
-                <p class="card-text text-secondary mb-4">Control de acceso y roles del personal (Staff).</p>
-                <button class="btn btn-light mt-auto fw-bold text-dark" @onclick='() => Nav.NavigateTo("/users")'>Gestionar Staff</button>
+                <p class="card-text text-light mb-4">Control de acceso y roles del personal (Staff).</p>
+                <button class="btn btn-santtoary mt-auto fw-bold" @onclick='() => Nav.NavigateTo("/users")'>Gestionar Staff</button>
             </div>
         </div>
     </div>
@@ -58,17 +58,44 @@
 
 <style>
     body {
-        background-color: #0a0f1c;
+        background-color: #0a0a0a;
     }
 
-    .card {
-        transition: transform 0.3s ease;
+    .card-santtoary {
+        background: #111;
+        border: 1px solid #1e1e1e;
+        border-radius: 15px;
+        transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         height: 100%;
     }
 
-    .card:hover {
-        transform: translateY(-10px);
-        border-color: #3b82f6 !important;
-        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.2);
+        .card-santtoary:hover {
+            transform: translateY(-10px);
+            border-color: #c9a84c !important;
+            box-shadow: 0 10px 25px rgba(201, 168, 76, 0.15);
+        }
+
+        .card-santtoary .text-light {
+            color: #b3b3b3 !important; /* Texto claro para mejor contraste */
+            font-size: 0.95rem;
+        }
+
+    .btn-santtoary {
+        background: #c9a84c; /* Fondo dorado sólido por defecto */
+        color: #0a0a0a; /* Texto oscuro para máxima lectura */
+        border: 1px solid #c9a84c;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        border-radius: 6px;
+        padding: 10px;
     }
+
+        .btn-santtoary:hover {
+            background: #e8c96e; /* Dorado más brillante al pasar el mouse */
+            border-color: #e8c96e;
+            color: #0a0a0a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(201, 168, 76, 0.3);
+        }
 </style>
