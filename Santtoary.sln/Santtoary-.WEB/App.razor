@@ -2,8 +2,9 @@
 
 <Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" />
-         <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+        @* ELIMINAMOS EL ROUTEVIEW QUE ESTABA DUPLICANDO LAS VISTAS *@
+
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
             <Authorizing>
                 <p>Autorizando...</p>
             </Authorizing>
@@ -21,4 +22,4 @@
             </LayoutView>
         </CascadingAuthenticationState>
     </NotFound>
-</Router>B.Layout
+</Router>
