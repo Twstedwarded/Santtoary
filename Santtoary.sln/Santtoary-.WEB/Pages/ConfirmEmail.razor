@@ -1,22 +1,23 @@
 ﻿@page "/api/Users/ConfirmEmail"
-
+@layout EmptyLayout
 @inject HttpClient Http
 @inject NavigationManager Nav
 @inject IJSRuntime JS
 
-<div class="login-page">
-    <div class="login-card" style="text-align: center;">
+<div class="auth-page">
+    <div class="auth-card">
 
-        <div class="login-header">
+        <div class="auth-header">
+            <div class="auth-mark">✦</div>
             <h1>Santtoary</h1>
             <p>Confirmación de cuenta</p>
         </div>
 
-        <p style="margin-bottom: 20px; color: #334155;">
+        <p class="auth-text">
             Estás a un paso de activar tu cuenta. Presiona el botón para confirmar tu correo electrónico.
         </p>
 
-        <button class="login-btn" @onclick="ConfirmAccountAsync">
+        <button class="auth-btn" @onclick="ConfirmAccountAsync">
             Confirmar Cuenta
         </button>
 
@@ -24,7 +25,6 @@
 </div>
 
 @code {
-    // Estas variables "atrapan" los datos larguísimos que vienen en el link del correo
     [Parameter]
     [SupplyParameterFromQuery(Name = "userid")]
     public string UserId { get; set; } = "";
@@ -35,18 +35,15 @@
 
     protected async Task ConfirmAccountAsync()
     {
-        // Enviamos esos datos al controlador del API para que cambie el "EmailConfirmed" a True
         var response = await Http.GetAsync($"api/users/ConfirmEmail?userId={UserId}&token={Token}");
 
         if (response.IsSuccessStatusCode)
         {
-            // Si sale bien, mostramos alerta y mandamos al Login
             await JS.InvokeVoidAsync("alert", "¡Gracias por confirmar tu email! Ahora puedes ingresar al sistema.");
             Nav.NavigateTo("/login");
         }
         else
         {
-            // Si algo falla (el token expiró, etc.)
             var error = await response.Content.ReadAsStringAsync();
             await JS.InvokeVoidAsync("alert", $"Hubo un problema: {error}");
             Nav.NavigateTo("/login");
@@ -55,56 +52,80 @@
 }
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        margin: 0;
-        font-family: Arial, Helvetica, sans-serif;
-    }
-
-    .login-page {
+    .auth-page {
         min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        background: linear-gradient(135deg, #0f172a, #1e293b);
+        background: #0a0a0a;
+        background-image: radial-gradient(ellipse at center, #1a1200 0%, #0a0a0a 70%);
+        font-family: 'Raleway', sans-serif;
     }
 
-    .login-card {
-        width: 380px;
-        background: white;
-        padding: 40px;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    .auth-card {
+        width: 400px;
+        background: #111;
+        border: 1px solid #222;
+        padding: 3rem 2.5rem;
+        border-radius: 8px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        text-align: center;
     }
 
-    .login-header h1 {
+    .auth-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .auth-mark {
+        color: #c9a84c;
+        font-size: 1.2rem;
+        margin-bottom: 0.75rem;
+        opacity: 0.8;
+        letter-spacing: 0.5em;
+    }
+
+    .auth-header h1 {
+        font-family: 'Cinzel', serif;
+        font-size: 1.8rem;
+        color: #c9a84c;
+        margin: 0 0 0.5rem;
+        letter-spacing: 0.15em;
+        font-weight: 700;
+    }
+
+    .auth-header p {
+        color: #b3b3b3;
+        font-size: 0.9rem;
         margin: 0;
-        font-size: 32px;
-        color: #0f172a;
+        letter-spacing: 0.03em;
     }
 
-    .login-header p {
-        color: gray;
-        margin-top: 10px;
+    .auth-text {
+        color: #e0e0e0;
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+        line-height: 1.6;
     }
 
-    .login-btn {
+    .auth-btn {
         width: 100%;
-        padding: 14px;
+        padding: 0.9rem;
         border: none;
-        border-radius: 12px;
-        background: #2563eb;
-        color: white;
-        font-size: 16px;
-        font-weight: bold;
+        border-radius: 4px;
+        background: #c9a84c;
+        color: #0a0a0a;
+        font-family: 'Raleway', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
         cursor: pointer;
-        transition: 0.3s;
+        transition: all 0.2s ease;
     }
 
-        .login-btn:hover {
-            background: #1d4ed8;
+        .auth-btn:hover {
+            background: #e8c96e;
+            box-shadow: 0 5px 15px rgba(201, 168, 76, 0.3);
         }
 </style>

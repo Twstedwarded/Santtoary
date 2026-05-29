@@ -1,16 +1,16 @@
 ﻿@page "/ResendToken"
-
+@layout EmptyLayout
 @using Microsoft.AspNetCore.Components.Forms
 @using Santtoary.Shared.DTOs
 @inject NavigationManager Nav
 @inject HttpClient Http
 @inject IJSRuntime JS
 
-<div class="login-page">
+<div class="auth-page">
+    <div class="auth-card">
 
-    <div class="login-card">
-
-        <div class="login-header">
+        <div class="auth-header">
+            <div class="auth-mark">✦</div>
             <h1>Santtoary</h1>
             <p>Reenviar correo de confirmación</p>
         </div>
@@ -20,27 +20,23 @@
 
             @if (!string.IsNullOrEmpty(mensajeError))
             {
-                <div style="color: #dc2626; background-color: #fee2e2; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-weight: bold;">
-                    @mensajeError
-                </div>
+                <div class="error-msg">@mensajeError</div>
             }
 
             <div class="input-group">
                 <label>Email</label>
-
                 <InputText class="input"
                            @bind-Value="emailDTO.Email"
                            placeholder="correo@email.com" />
                 <ValidationMessage For="@(() => emailDTO.Email)" />
             </div>
 
-            <button type="submit" class="login-btn">
+            <button type="submit" class="auth-btn">
                 Reenviar Correo
             </button>
-
         </EditForm>
 
-        <div class="register-link">
+        <div class="auth-footer-link">
             <a href="/login">Volver al Login</a>
         </div>
 
@@ -70,98 +66,127 @@
 }
 
 <style>
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        margin: 0;
-        font-family: Arial, Helvetica, sans-serif;
-    }
-
-    .login-page {
+    .auth-page {
         min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        background: linear-gradient(135deg, #0f172a, #1e293b);
+        background: #0a0a0a;
+        background-image: radial-gradient(ellipse at center, #1a1200 0%, #0a0a0a 70%);
+        font-family: 'Raleway', sans-serif;
     }
 
-    .login-card {
-        width: 380px;
-        background: white;
-        padding: 40px;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    .auth-card {
+        width: 400px;
+        background: #111;
+        border: 1px solid #222;
+        padding: 3rem 2.5rem;
+        border-radius: 8px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
     }
 
-    .login-header {
+    .auth-header {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 2.5rem;
     }
 
-        .login-header h1 {
-            margin: 0;
-            font-size: 32px;
-            color: #0f172a;
-        }
+    .auth-mark {
+        color: #c9a84c;
+        font-size: 1.2rem;
+        margin-bottom: 0.75rem;
+        opacity: 0.8;
+        letter-spacing: 0.5em;
+    }
 
-        .login-header p {
-            color: gray;
-            margin-top: 10px;
-        }
+    .auth-header h1 {
+        font-family: 'Cinzel', serif;
+        font-size: 1.8rem;
+        color: #c9a84c;
+        margin: 0 0 0.5rem;
+        letter-spacing: 0.15em;
+        font-weight: 700;
+    }
+
+    .auth-header p {
+        color: #b3b3b3;
+        font-size: 0.9rem;
+        margin: 0;
+        letter-spacing: 0.03em;
+    }
+
+    .error-msg {
+        background: #1a0a0a;
+        border: 1px solid #ef5350;
+        color: #ff8a80;
+        padding: 0.75rem 1rem;
+        border-radius: 4px;
+        margin-bottom: 1.5rem;
+        font-size: 0.85rem;
+        text-align: center;
+    }
 
     .input-group {
-        margin-bottom: 20px;
+        margin-bottom: 1.25rem;
     }
 
         .input-group label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #334155;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #c9a84c;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
         }
 
     .input {
         width: 100%;
-        padding: 14px;
-        border: none;
-        border-radius: 12px;
-        background: #f1f5f9;
-        font-size: 15px;
+        padding: 0.85rem 1rem;
+        border: 1px solid #333;
+        border-radius: 4px;
+        background: #0d0d0d;
+        color: #fff;
+        font-size: 0.9rem;
         outline: none;
+        transition: border-color 0.2s ease;
     }
 
         .input:focus {
-            border: 2px solid #2563eb;
+            border-color: #c9a84c;
+            box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.2);
         }
 
-    .login-btn {
+    .auth-btn {
         width: 100%;
-        padding: 14px;
+        padding: 0.9rem;
         border: none;
-        border-radius: 12px;
-        background: #2563eb;
-        color: white;
-        font-size: 16px;
-        font-weight: bold;
+        border-radius: 4px;
+        background: #c9a84c;
+        color: #0a0a0a;
+        font-family: 'Raleway', sans-serif;
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
         cursor: pointer;
-        transition: 0.3s;
+        transition: all 0.2s ease;
+        margin-top: 0.5rem;
     }
 
-        .login-btn:hover {
-            background: #1d4ed8;
+        .auth-btn:hover {
+            background: #e8c96e;
         }
 
-    .register-link {
-        margin-top: 20px;
+    .auth-footer-link {
+        margin-top: 1.5rem;
         text-align: center;
-        color: #64748b;
+        color: #b3b3b3;
+        font-size: 0.85rem;
     }
 
-        .register-link a {
-            color: #2563eb;
+        .auth-footer-link a {
+            color: #c9a84c;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 600;
         }
-</style>
+</style> 
