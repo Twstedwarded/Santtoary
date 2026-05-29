@@ -45,7 +45,22 @@ namespace Santtoary_.WEB.Auth
         {
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
             var unserializedToken = jwtSecurityTokenHandler.ReadJwtToken(token);
-            return unserializedToken.Claims;
+            var claims = unserializedToken.Claims.ToList();
+
+            // El token viene con el nombre largo del claim de rol
+            // Lo mapeamos explícitamente a ClaimTypes.Role
+            var roleClaims = claims
+                .Where(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+                         || c.Type == "role")
+                .Select(c => new Claim(ClaimTypes.Role, c.Value))
+                .ToList();
+
+            // Quitamos los originales y añadimos los mapeados
+            claims.RemoveAll(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+                               || c.Type == "role");
+            claims.AddRange(roleClaims);
+
+            return claims;
         }
 
         public async Task LoginAsync(string token)
@@ -63,3 +78,4 @@ namespace Santtoary_.WEB.Auth
         }
     }
 }
+

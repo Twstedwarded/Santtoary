@@ -14,16 +14,14 @@ namespace Santtoary_.WEB.Helpers
 
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            // Buscamos el token en el navegador
-            var token = await _js.InvokeAsync<string>("localStorage.getItem", "authToken");
+            // ← CAMBIO: de "authToken" a "TOKEN_KEY" para que coincida con AuthenticationProviderJWT
+            var token = await _js.InvokeAsync<string>("localStorage.getItem", "TOKEN_KEY");
 
-            // Si hay token, lo pegamos en la cabecera (Header)
             if (!string.IsNullOrEmpty(token))
             {
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
 
-            // Enviamos la petición
             return await base.SendAsync(request, cancellationToken);
         }
     }

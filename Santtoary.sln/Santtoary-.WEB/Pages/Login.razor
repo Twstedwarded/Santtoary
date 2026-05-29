@@ -2,9 +2,11 @@
 @layout EmptyLayout
 @using Microsoft.AspNetCore.Components.Forms
 @using Santtoary.Shared.DTOs
+@using Santtoary_.WEB.Auth
 @inject NavigationManager Nav
 @inject IHttpClientFactory ClientFactory
 @inject IJSRuntime JSRuntime
+@inject ILoginService LoginService
 
 <div class="auth-page">
     <div class="auth-card">
@@ -46,7 +48,6 @@
 
     </div>
 </div>
-
 @code {
     LoginDTO loginModel = new();
     private string? mensajeError;
@@ -63,13 +64,17 @@
             if (response.IsSuccessStatusCode)
             {
                 var token = await response.Content.ReadAsStringAsync();
-                await JSRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", token);
+                // CAMBIO: usar LoginService en vez de localStorage directo
+                // Esto guarda con TOKEN_KEY Y notifica a Blazor del cambio de estado
+                await LoginService.LoginAsync(token);
                 Nav.NavigateTo("/panel");
             }
             else
             {
                 var errorContent = await response.Content.ReadAsStringAsync();
-                mensajeError = string.IsNullOrEmpty(errorContent) ? "Usuario o contraseña incorrectos." : errorContent;
+                mensajeError = string.IsNullOrEmpty(errorContent)
+                    ? "Usuario o contraseña incorrectos."
+                    : errorContent;
             }
         }
         catch (Exception ex)
@@ -78,6 +83,8 @@
         }
     }
 }
+
+
 
 <style>
     .auth-page {
