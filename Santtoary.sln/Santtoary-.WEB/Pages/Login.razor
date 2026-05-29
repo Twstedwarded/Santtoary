@@ -2,7 +2,8 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Santtoary.Shared.DTOs
 @inject NavigationManager Nav
-@inject HttpClient Http
+@inject IHttpClientFactory ClientFactory
+@inject IJSRuntime JSRuntime
 
 <div class="auth-page">
     <div class="auth-card">
@@ -44,6 +45,7 @@
 
     </div>
 </div>
+
 @code {
     LoginDTO loginModel = new();
     private string? mensajeError;
@@ -54,29 +56,28 @@
 
         try
         {
+            // Instanciamos el cliente específico que contiene el AuthorizationMessageHandler
+            var Http = ClientFactory.CreateClient("Santtoary.API");
+
+            // El API nos devuelve el token como un string si las credenciales son correctas
             var response = await Http.PostAsJsonAsync("api/users/login", loginModel);
 
             if (response.IsSuccessStatusCode)
             {
-                // Si tienes lógica para guardar el token, ponla aquí.
-                // Por ahora solo navegamos.
+                // 1. Leemos el token que el API nos envía
+                var token = await response.Content.ReadAsStringAsync();
+
+                // 2. Guardamos el token en el almacenamiento local del navegador
+                await JSRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", token);
+
+                // 3. Navegamos al panel
                 Nav.NavigateTo("/panel");
             }
             else
             {
-                // AQUÍ ESTÁ EL TRUCO: Leemos lo que el servidor dice realmente
+                // Si el API devuelve un error (ej: 400), leemos el mensaje de error del servidor
                 var errorContent = await response.Content.ReadAsStringAsync();
-
-                if (string.IsNullOrEmpty(errorContent))
-                {
-                    mensajeError = "Usuario o contraseña incorrectos.";
-                }
-                else
-                {
-                    // Mostramos el mensaje exacto que viene del servidor
-                    // (Ej: "El correo no ha sido confirmado")
-                    mensajeError = errorContent;
-                }
+                mensajeError = string.IsNullOrEmpty(errorContent) ? "Usuario o contraseña incorrectos." : errorContent;
             }
         }
         catch (Exception ex)
@@ -85,6 +86,7 @@
         }
     }
 }
+
 <style>
     .auth-page {
         min-height: 100vh;
@@ -149,15 +151,15 @@
         margin-bottom: 1.25rem;
     }
 
-    .input-group label {
-        display: block;
-        margin-bottom: 0.5rem;
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #555;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-    }
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #555;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
 
     .input {
         width: 100%;
@@ -173,14 +175,14 @@
         box-sizing: border-box;
     }
 
-    .input:focus {
-        border-color: #c9a84c;
-        box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.1);
-    }
+        .input:focus {
+            border-color: #c9a84c;
+            box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.1);
+        }
 
-    .input::placeholder {
-        color: #333;
-    }
+        .input::placeholder {
+            color: #333;
+        }
 
     .auth-btn {
         width: 100%;
@@ -199,15 +201,9 @@
         margin-top: 0.5rem;
     }
 
-    .auth-btn:hover {
-        background: #e8c96e;
-    }
-
-    .auth-btn:focus,
-    .auth-btn:active {
-        outline: none;
-        box-shadow: none;
-    }
+        .auth-btn:hover {
+            background: #e8c96e;
+        }
 
     .auth-footer-link {
         margin-top: 1.5rem;
@@ -216,14 +212,9 @@
         font-size: 0.85rem;
     }
 
-    .auth-footer-link a {
-        color: #c9a84c;
-        text-decoration: none;
-        font-weight: 600;
-        transition: color 0.2s ease;
-    }
-
-    .auth-footer-link a:hover {
-        color: #e8c96e;
-    }
+        .auth-footer-link a {
+            color: #c9a84c;
+            text-decoration: none;
+            font-weight: 600;
+        }
 </style>

@@ -7,12 +7,15 @@ using Santtoary.API.DATA;
 using Santtoary.Shared.DTOs;
 using Santtoary.API.Helpers;
 using Santtoary.Shared.Entidades;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Santtoary.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // Protege por defecto los métodos de este controlador
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
@@ -28,12 +31,14 @@ namespace Santtoary.API.Controllers
             _configuration = configuration;
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         public async Task<ActionResult> Get()
         {
             return Ok(await _context.Users.ToListAsync());
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(string id)
         {
@@ -45,7 +50,7 @@ namespace Santtoary.API.Controllers
             return Ok(user);
         }
 
-        [AllowAnonymous] // Acceso público para registrarse
+        [AllowAnonymous]
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] UserDTO model)
         {
@@ -87,7 +92,7 @@ namespace Santtoary.API.Controllers
             return BadRequest(errorMessages);
         }
 
-        [AllowAnonymous] // Acceso público para confirmar correo
+        [AllowAnonymous]
         [HttpGet("ConfirmEmail")]
         public async Task<ActionResult> ConfirmEmailAsync(string userId, string token)
         {
@@ -109,7 +114,7 @@ namespace Santtoary.API.Controllers
             return NoContent();
         }
 
-        [AllowAnonymous] // Acceso público para loguearse
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginDTO model)
         {
@@ -127,12 +132,14 @@ namespace Santtoary.API.Controllers
                     return BadRequest("El usuario no ha sido habilitado, debes seguir las instrucciones del correo enviado para poder habilitar el usuario.");
                 }
 
-                return Ok();
+                var token = GenerateJwtToken(user);
+                return Ok(token);
             }
 
             return BadRequest("Usuario o contraseña incorrectos.");
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(string id, User user)
         {
@@ -156,6 +163,7 @@ namespace Santtoary.API.Controllers
             return Ok(userDb);
         }
 
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(string id)
         {
@@ -171,7 +179,7 @@ namespace Santtoary.API.Controllers
             return NoContent();
         }
 
-        [AllowAnonymous] // Acceso público para reenviar token
+        [AllowAnonymous]
         [HttpPost("ResedToken")]
         public async Task<ActionResult> ResedToken([FromBody] EmailDTO model)
         {
@@ -201,6 +209,28 @@ namespace Santtoary.API.Controllers
             }
 
             return BadRequest(response.Message);
+        }
+
+        private string GenerateJwtToken(User user)
+        {
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email!),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["jwtKey"]!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: null,
+                audience: null,
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(7),
+                signingCredentials: creds
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

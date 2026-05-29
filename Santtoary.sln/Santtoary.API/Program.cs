@@ -16,7 +16,6 @@ builder.Services.AddControllers().AddJsonOptions(x =>
 
 // Agrega servicios para Swagger/OpenAPI
 builder.Services.AddOpenApi();
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -68,7 +67,6 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-app.UseCors();
 
 // Ejecución de Migraciones y Seed
 using (var scope = app.Services.CreateScope())
@@ -79,7 +77,6 @@ using (var scope = app.Services.CreateScope())
         dbContext.Database.Migrate();
     }
 }
-
 using (var scope = app.Services.CreateScope())
 {
     var seed = scope.ServiceProvider.GetRequiredService<SeedDb>();
@@ -95,8 +92,12 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+
 app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
+app.UseRouting();          // 1. Primero define las rutas
+app.UseCors();             // 2. Luego aplica el CORS para dejar pasar al navegador
+app.UseAuthentication();   // 3. Luego Autentica
+app.UseAuthorization();    // 4. Luego Autoriza
 app.MapControllers();
+
 app.Run();
