@@ -13,7 +13,7 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 
-var apiBaseUrl = "https://localhost:8000/";
+var apiBaseUrl = "https://santtoary.azurewebsites.net";
 
 
 builder.Services.AddScoped<Santtoary_.WEB.Helpers.AuthorizationMessageHandler>();
