@@ -5,22 +5,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Santtoary.API.DATA;
 using Santtoary.Shared.DTOs;
-using Santtoary.API.Helpers; // IMPORTANTE: Agregamos esto para que reconozca el MailHelper
+using Santtoary.API.Helpers;
 using Santtoary.Shared.Entidades;
 
 namespace Santtoary.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // Protege los controladores existentes
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // Protege por defecto los métodos de este controlador
     public class UsersController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<User> _userManager;
-        private readonly IMailHelper _mailHelper; // Agregado para enviar correos
-        private readonly IConfiguration _configuration; // Agregado para leer el puerto 7000
+        private readonly IMailHelper _mailHelper;
+        private readonly IConfiguration _configuration;
 
-        // Inyectamos las nuevas herramientas en el constructor
         public UsersController(ApplicationDbContext context, UserManager<User> userManager, IMailHelper mailHelper, IConfiguration configuration)
         {
             _context = context;
@@ -29,14 +28,12 @@ namespace Santtoary.API.Controllers
             _configuration = configuration;
         }
 
-        // Obtener todos los usuarios para la tabla principal
         [HttpGet]
         public async Task<ActionResult> Get()
         {
             return Ok(await _context.Users.ToListAsync());
         }
 
-        // IMPORTANTE: Obtener un usuario por ID (necesario para EDITAR)
         [HttpGet("{id}")]
         public async Task<ActionResult> Get(string id)
         {
@@ -48,7 +45,7 @@ namespace Santtoary.API.Controllers
             return Ok(user);
         }
 
-        // Crear un nuevo usuario desde el panel y ENVIAR CORREO
+        [AllowAnonymous] // Acceso público para registrarse
         [HttpPost]
         public async Task<ActionResult> Post([FromBody] UserDTO model)
         {
@@ -64,17 +61,14 @@ namespace Santtoary.API.Controllers
 
             if (result.Succeeded)
             {
-                // 1. Generamos el token de confirmación de correo
                 var myToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
-                // 2. Armamos el link que el usuario va a clickear
                 var tokenLink = Url.Action("ConfirmEmail", "users", new
                 {
                     userid = user.Id,
                     token = myToken
                 }, HttpContext.Request.Scheme, _configuration["UrlWEB"]);
 
-                // 3. Enviamos el correo usando nuestra clase MailHelper
                 var response = _mailHelper.SendMail(user.UserName, user.Email!,
                     $"Santtoary - Confirmación de cuenta",
                     $"<h1>Santtoary - Confirmación de cuenta</h1>" +
@@ -93,7 +87,7 @@ namespace Santtoary.API.Controllers
             return BadRequest(errorMessages);
         }
 
-        // NUEVO MÉTODO: Para recibir el clic del correo y confirmar la cuenta
+        [AllowAnonymous] // Acceso público para confirmar correo
         [HttpGet("ConfirmEmail")]
         public async Task<ActionResult> ConfirmEmailAsync(string userId, string token)
         {
@@ -115,7 +109,7 @@ namespace Santtoary.API.Controllers
             return NoContent();
         }
 
-        // Validar el Login
+        [AllowAnonymous] // Acceso público para loguearse
         [HttpPost("login")]
         public async Task<ActionResult> Login([FromBody] LoginDTO model)
         {
@@ -128,10 +122,9 @@ namespace Santtoary.API.Controllers
             var isPasswordValid = await _userManager.CheckPasswordAsync(user, model.Password);
             if (isPasswordValid)
             {
-                // Verificamos si ya confirmó el correo
                 if (!user.EmailConfirmed)
                 {
-                    return BadRequest("El usuario no ha sido habilitado, debes de seguir las instrucciones del correo enviado para poder habilitar el usuario.");
+                    return BadRequest("El usuario no ha sido habilitado, debes seguir las instrucciones del correo enviado para poder habilitar el usuario.");
                 }
 
                 return Ok();
@@ -140,7 +133,6 @@ namespace Santtoary.API.Controllers
             return BadRequest("Usuario o contraseña incorrectos.");
         }
 
-        // Actualizar un usuario existente
         [HttpPut("{id}")]
         public async Task<ActionResult> Put(string id, User user)
         {
@@ -164,7 +156,6 @@ namespace Santtoary.API.Controllers
             return Ok(userDb);
         }
 
-        // Eliminar un usuario
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(string id)
         {
@@ -179,7 +170,8 @@ namespace Santtoary.API.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
-        // Método para reenviar el correo de confirmación
+
+        [AllowAnonymous] // Acceso público para reenviar token
         [HttpPost("ResedToken")]
         public async Task<ActionResult> ResedToken([FromBody] EmailDTO model)
         {
