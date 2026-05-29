@@ -1,15 +1,16 @@
-﻿@page "/citas"
-@inject HttpClient Http
-@inject NavigationManager Nav
+﻿@page "/appointments"
+@inject IRepository repository
+@inject NavigationManager navigationManager
 
 <h3>Citas</h3>
-<a href="/citas/crear" class="btn btn-primary mb-3">+ Nueva Cita</a>
 
-@if (lista == null)
+<a href="/appointments/crear" class="btn btn-primary mb-3">Nueva Cita</a>
+
+@if (appointments == null)
 {
     <p>Cargando...</p>
 }
-else if (!lista.Any())
+else if (!appointments.Any())
 {
     <p>No hay citas registradas.</p>
 }
@@ -19,27 +20,43 @@ else
         <thead>
             <tr>
                 <th>Fecha</th>
+                <th>Cliente</th>
+                <th>Artista</th>
                 <th>Horas estimadas</th>
                 <th>Precio total</th>
                 <th>Estado</th>
-                <th>Cliente</th>
-                <th>Artista</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in lista)
+            @foreach (var appointment in appointments)
             {
                 <tr>
-                    <td>@item.Date.ToShortDateString()</td>
-                    <td>@item.EstimatedHours</td>
-                    <td>@item.TotalPrice.ToString("C")</td>
-                    <td>@item.Status</td>
-                    <td>@item.Client?.Name</td>
-                    <td>@item.Artist?.Name</td>
+                    <td>@appointment.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@appointment.Client?.Name</td>
+                    <td>@appointment.Artist?.Name</td>
+                    <td>@appointment.EstimatedHours</td>
+                    <td>@appointment.TotalPrice.ToString("C")</td>
                     <td>
-                        <a href="/citas/editar/@item.Id" class="btn btn-warning btn-sm">Editar</a>
-                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)">Eliminar</button>
+                        @switch (appointment.Status)
+                        {
+                            case "Pendiente":
+                                <span class="badge bg-warning text-dark">Pendiente</span>
+                                break;
+                            case "Confirmada":
+                                <span class="badge bg-success">Confirmada</span>
+                                break;
+                            case "Cancelada":
+                                <span class="badge bg-danger">Cancelada</span>
+                                break;
+                            default:
+                                <span class="badge bg-secondary">@appointment.Status</span>
+                                break;
+                        }
+                    </td>
+                    <td>
+                        <a href="/appointments/editar/@appointment.Id" class="btn btn-warning btn-sm">Editar</a>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Delete(appointment.Id)">Eliminar</button>
                     </td>
                 </tr>
             }
@@ -47,35 +64,24 @@ else
     </table>
 }
 
-@if (mensaje != null)
-{
-    <div class="alert alert-info">@mensaje</div>
-}
-
 @code {
-    private List<Appointment>? lista;
-    private string? mensaje;
-
-    [Inject] IJSRuntime JS { get; set; } = default!;
+    private List<Appointment>? appointments;
 
     protected override async Task OnInitializedAsync()
     {
-        await Cargar();
-    }
-
-    async Task Cargar()
-    {
-        lista = await Http.GetFromJsonAsync<List<Appointment>>("api/appointments");
-    }
-
-    async Task Eliminar(int id)
-    {
-        var confirm = await JS.InvokeAsync<bool>("confirm", "¿Seguro que deseas eliminar esta cita?");
-        if (confirm)
+        var result = await repository.GetAsync<List<Appointment>>("api/appointments");
+        if (!result.Error)
         {
-            await Http.DeleteAsync($"api/appointments/{id}");
-            mensaje = "Cita eliminada correctamente.";
-            await Cargar();
+            appointments = result.Response;
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        var result = await repository.DeleteAsync($"api/appointments/{id}");
+        if (!result.Error)
+        {
+            await OnInitializedAsync();
         }
     }
 }

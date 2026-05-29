@@ -1,25 +1,24 @@
-﻿@page "/disenos"
-@using Santtoary.Shared.Entidades
-@inject HttpClient Http
-@inject NavigationManager Nav
+﻿@page "/designs"
+@inject IRepository repository
+@inject NavigationManager navigationManager
 
 <h3>Diseños</h3>
-<a href="/disenos/crear" class="btn btn-primary mb-3">+ Nuevo Diseño</a>
 
-@if (lista == null)
+<a href="/designs/crear" class="btn btn-primary mb-3">Nuevo Diseño</a>
+
+@if (designs == null)
 {
     <p>Cargando...</p>
 }
-else if (!lista.Any())
+else if (!designs.Any())
 {
     <p>No hay diseños registrados.</p>
 }
 else
 {
-    <table class="table table-striped align-middle">
+    <table class="table table-striped">
         <thead>
             <tr>
-                <th>Imagen</th> @* Nueva columna *@
                 <th>Título</th>
                 <th>Precio</th>
                 <th>Artista</th>
@@ -27,29 +26,15 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in lista)
+            @foreach (var design in designs)
             {
                 <tr>
+                    <td>@design.Title</td>
+                    <td>@design.Price.ToString("C")</td>
+                    <td>@design.Artist?.Name</td>
                     <td>
-                        @if (!string.IsNullOrEmpty(item.ImageUrl))
-                        {
-                            <img src="@item.ImageUrl" style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px; border: 1px solid #334155;" />
-                        }
-                        else
-                        {
-                            <span class="text-muted" style="font-size: 12px;">Sin foto</span>
-                        }
-                    </td>
-                    <td>@item.Title</td>
-                    <td>@item.Price.ToString("C2")</td>
-                    <td>
-                        <span class="badge bg-secondary">
-                            @(item.Artist?.Name ?? "No asignado")
-                        </span>
-                    </td>
-                    <td>
-                        <a href="/disenos/editar/@item.Id" class="btn btn-warning btn-sm">Editar</a>
-                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)">Eliminar</button>
+                        <a href="/designs/editar/@design.Id" class="btn btn-warning btn-sm">Editar</a>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Delete(design.Id)">Eliminar</button>
                     </td>
                 </tr>
             }
@@ -57,43 +42,24 @@ else
     </table>
 }
 
-@if (mensaje != null)
-{
-    <div class="alert alert-info mt-3">@mensaje</div>
-}
-
 @code {
-    private List<Design>? lista;
-    private string? mensaje;
-
-    [Inject] IJSRuntime JS { get; set; } = default!;
+    private List<Design>? designs;
 
     protected override async Task OnInitializedAsync()
     {
-        await Cargar();
-    }
-
-    async Task Cargar()
-    {
-        // Llamada al API
-        lista = await Http.GetFromJsonAsync<List<Design>>("api/designs");
-    }
-
-    async Task Eliminar(int id)
-    {
-        var confirm = await JS.InvokeAsync<bool>("confirm", "¿Seguro que deseas eliminar este diseño?");
-        if (confirm)
+        var result = await repository.GetAsync<List<Design>>("api/designs");
+        if (!result.Error)
         {
-            var response = await Http.DeleteAsync($"api/designs/{id}");
-            if (response.IsSuccessStatusCode)
-            {
-                mensaje = "Diseño eliminado correctamente.";
-                await Cargar();
-            }
-            else
-            {
-                mensaje = "Error al intentar eliminar el diseño.";
-            }
+            designs = result.Response;
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        var result = await repository.DeleteAsync($"api/designs/{id}");
+        if (!result.Error)
+        {
+            await OnInitializedAsync();
         }
     }
 }

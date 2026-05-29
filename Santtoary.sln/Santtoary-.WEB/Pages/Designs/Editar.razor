@@ -1,78 +1,79 @@
-﻿@page "/disenos/editar/{Id:int}"
-@using Santtoary.Shared.Entidades
-@inject HttpClient Http
-@inject NavigationManager Nav
+﻿@page "/designs/editar/{Id:int}"
+@inject IRepository repository
+@inject NavigationManager navigationManager
 
 <h3>Editar Diseño</h3>
 
-@if (diseno == null)
+@if (design == null)
 {
-    <p><em>Cargando datos del diseño...</em></p>
+    <p>Cargando...</p>
 }
 else
 {
-    <EditForm Model="diseno" OnValidSubmit="Guardar">
+    <EditForm Model="design" OnValidSubmit="Save">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
         <div class="mb-3">
-            <label>Título *</label>
-            <InputText class="form-control" @bind-Value="diseno.Title" />
-            <ValidationMessage For="@(() => diseno.Title)" />
+            <label>Título</label>
+            <InputText class="form-control" @bind-Value="design.Title" />
+            <ValidationMessage For="@(() => design.Title)" />
         </div>
-
         <div class="mb-3">
             <label>URL de imagen</label>
-            <InputText class="form-control" @bind-Value="diseno.ImageUrl" placeholder="Pega el link de la foto aquí..." />
-            @if (!string.IsNullOrEmpty(diseno.ImageUrl))
-            {
-                <div class="mt-2">
-                    <img src="@diseno.ImageUrl" style="max-width: 200px; border-radius: 10px;" alt="Previsualización" />
-                </div>
-            }
+            <InputText class="form-control" @bind-Value="design.ImageUrl" />
         </div>
-
         <div class="mb-3">
-            <label>Precio *</label>
-            <InputNumber class="form-control" @bind-Value="diseno.Price" />
-            <ValidationMessage For="@(() => diseno.Price)" />
+            <label>Precio</label>
+            <InputNumber class="form-control" @bind-Value="design.Price" />
+            <ValidationMessage For="@(() => design.Price)" />
         </div>
-
         <div class="mb-3">
-            <label>Artista responsable *</label>
-            <InputSelect class="form-control" @bind-Value="diseno.ArtistId">
-                <option value="0">-- Seleccione un artista --</option>
-                @foreach (var artista in artistas)
+            <label>Artista</label>
+            <InputSelect class="form-control" @bind-Value="design.ArtistId">
+                <option value="">-- Seleccione un artista --</option>
+                @if (artists != null)
                 {
-                    <option value="@artista.Id">@artista.Name</option>
+                    @foreach (var artist in artists)
+                    {
+                        <option value="@artist.Id">@artist.Name</option>
+                    }
                 }
             </InputSelect>
-            <ValidationMessage For="@(() => diseno.ArtistId)" />
+            <ValidationMessage For="@(() => design.ArtistId)" />
         </div>
 
-        <button type="submit" class="btn btn-success">Guardar cambios</button>
-        <a href="/disenos" class="btn btn-secondary ms-2">Cancelar</a>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+        <a href="/designs" class="btn btn-secondary ms-2">Cancelar</a>
     </EditForm>
 }
 
 @code {
     [Parameter] public int Id { get; set; }
-    private Design? diseno;
-    private List<Artist> artistas = new();
+    private Design? design;
+    private List<Artist>? artists;
 
     protected override async Task OnInitializedAsync()
     {
-        // Cargamos el diseño y la lista de artistas para el desplegable
-        diseno = await Http.GetFromJsonAsync<Design>($"api/designs/{Id}");
-        artistas = await Http.GetFromJsonAsync<List<Artist>>("api/artists") ?? new();
+        var resultDesign = await repository.GetAsync<Design>($"api/designs/{Id}");
+        if (!resultDesign.Error)
+        {
+            design = resultDesign.Response;
+        }
+
+        var resultArtists = await repository.GetAsync<List<Artist>>("api/artists");
+        if (!resultArtists.Error)
+        {
+            artists = resultArtists.Response;
+        }
     }
 
-    async Task Guardar()
+    private async Task Save()
     {
-        var response = await Http.PutAsJsonAsync($"api/designs/{Id}", diseno);
-        if (response.IsSuccessStatusCode)
+        var result = await repository.PutAsync($"api/designs/{Id}", design);
+        if (!result.Error)
         {
-            Nav.NavigateTo("/disenos");
+            navigationManager.NavigateTo("/designs");
         }
     }
 }

@@ -1,40 +1,41 @@
-﻿@page "/inventario/crear"
-@inject HttpClient Http
-@inject NavigationManager Nav
+﻿@page "/inventory/crear"
+@inject IRepository repository
+@inject NavigationManager navigationManager
 
-<h3>Nuevo Insumo</h3>
+<h3>Nuevo Item</h3>
 
-<EditForm Model="item" OnValidSubmit="Guardar">
+<EditForm Model="item" OnValidSubmit="Save">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="mb-3">
-        <label>Nombre del insumo *</label>
+        <label>Nombre</label>
         <InputText class="form-control" @bind-Value="item.Name" />
         <ValidationMessage For="@(() => item.Name)" />
     </div>
-
     <div class="mb-3">
-        <label>Cantidad *</label>
+        <label>Cantidad</label>
         <InputNumber class="form-control" @bind-Value="item.Quantity" />
         <ValidationMessage For="@(() => item.Quantity)" />
     </div>
-
     <div class="mb-3">
-        <label>Stock Mínimo</label>
+        <label>Stock mínimo</label>
         <InputNumber class="form-control" @bind-Value="item.MinimumStockLevel" />
     </div>
 
-    <button type="submit" class="btn btn-success">Guardar</button>
-    <a href="/inventario" class="btn btn-secondary ms-2">Cancelar</a>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="/inventory" class="btn btn-secondary ms-2">Cancelar</a>
 </EditForm>
 
 @code {
     private InventoryItem item = new();
 
-    async Task Guardar()
+    private async Task Save()
     {
-        await Http.PostAsJsonAsync("api/inventoryitems", item);
-        Nav.NavigateTo("/inventario");
+        var result = await repository.PostAsync("api/inventoryitems", item);
+        if (!result.Error)
+        {
+            navigationManager.NavigateTo("/inventory");
+        }
     }
 }

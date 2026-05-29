@@ -1,17 +1,18 @@
-﻿@page "/inventario"
-@inject HttpClient Http
-@inject NavigationManager Nav
+﻿@page "/inventory"
+@inject IRepository repository
+@inject NavigationManager navigationManager
 
 <h3>Inventario</h3>
-<a href="/inventario/crear" class="btn btn-primary mb-3">+ Nuevo Insumo</a>
 
-@if (lista == null)
+<a href="/inventory/crear" class="btn btn-primary mb-3">Nuevo Item</a>
+
+@if (items == null)
 {
     <p>Cargando...</p>
 }
-else if (!lista.Any())
+else if (!items.Any())
 {
-    <p>No hay insumos registrados.</p>
+    <p>No hay items en el inventario.</p>
 }
 else
 {
@@ -20,15 +21,15 @@ else
             <tr>
                 <th>Nombre</th>
                 <th>Cantidad</th>
-                <th>Stock Mínimo</th>
+                <th>Stock mínimo</th>
                 <th>Estado</th>
                 <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in lista)
+            @foreach (var item in items)
             {
-                <tr class="@(item.Quantity <= item.MinimumStockLevel ? "table-danger" : "")">
+                <tr>
                     <td>@item.Name</td>
                     <td>@item.Quantity</td>
                     <td>@item.MinimumStockLevel</td>
@@ -43,8 +44,8 @@ else
                         }
                     </td>
                     <td>
-                        <a href="/inventario/editar/@item.Id" class="btn btn-warning btn-sm">Editar</a>
-                        <button class="btn btn-danger btn-sm" @onclick="() => Eliminar(item.Id)">Eliminar</button>
+                        <a href="/inventory/editar/@item.Id" class="btn btn-warning btn-sm">Editar</a>
+                        <button class="btn btn-danger btn-sm" @onclick="() => Delete(item.Id)">Eliminar</button>
                     </td>
                 </tr>
             }
@@ -52,35 +53,24 @@ else
     </table>
 }
 
-@if (mensaje != null)
-{
-    <div class="alert alert-info">@mensaje</div>
-}
-
 @code {
-    private List<InventoryItem>? lista;
-    private string? mensaje;
-
-    [Inject] IJSRuntime JS { get; set; } = default!;
+    private List<InventoryItem>? items;
 
     protected override async Task OnInitializedAsync()
     {
-        await Cargar();
-    }
-
-    async Task Cargar()
-    {
-        lista = await Http.GetFromJsonAsync<List<InventoryItem>>("api/inventoryitems");
-    }
-
-    async Task Eliminar(int id)
-    {
-        var confirm = await JS.InvokeAsync<bool>("confirm", "¿Seguro que deseas eliminar este insumo?");
-        if (confirm)
+        var result = await repository.GetAsync<List<InventoryItem>>("api/inventoryitems");
+        if (!result.Error)
         {
-            await Http.DeleteAsync($"api/inventoryitems/{id}");
-            mensaje = "Insumo eliminado correctamente.";
-            await Cargar();
+            items = result.Response;
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        var result = await repository.DeleteAsync($"api/inventoryitems/{id}");
+        if (!result.Error)
+        {
+            await OnInitializedAsync();
         }
     }
 }

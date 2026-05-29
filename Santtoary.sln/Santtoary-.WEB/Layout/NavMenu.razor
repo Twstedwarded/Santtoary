@@ -1,52 +1,187 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Santtoary-.WEB</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+﻿<div class="santtoary-sidebar">
+
+    <div class="brand">
+        <span class="brand-mark">✦</span>
+        <span class="brand-name">Santtoary</span>
+    </div>
+
+    <button class="nav-toggler" @onclick="ToggleNavMenu" title="Navigation menu">
+        ☰
+    </button>
+
+    <div class="@NavMenuCssClass nav-body">
+        <nav>
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6-.354.353V14.5A1.5 1.5 0 0 0 2.5 16h4a.5.5 0 0 0 .5-.5V11h2v4.5a.5.5 0 0 0 .5.5h4a1.5 1.5 0 0 0 1.5-1.5V7.5l-.354-.354z"/>
+                </svg>
+                <span>Home</span>
+            </NavLink>
+
+            <div class="nav-section">GESTIÓN</div>
+
+            <NavLink class="nav-link" href="clients">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002A.274.274 0 0 1 15 13zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4m3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0M6.936 9.28a6 6 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4q0 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816M4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275ZM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0m3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4"/>
+                </svg>
+                <span>Clientes</span>
+            </NavLink>
+
+            <NavLink class="nav-link" href="artists">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M11.5 2a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M9.05 3a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0V3zM4.5 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M2.05 8a2.5 2.5 0 0 1 4.9 0H16v1H6.95a2.5 2.5 0 0 1-4.9 0H0V8zm9.45 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m-2.45 1a2.5 2.5 0 0 1 4.9 0H16v1h-2.05a2.5 2.5 0 0 1-4.9 0H0v-1z"/>
+                </svg>
+                <span>Artistas</span>
+            </NavLink>
+
+            <NavLink class="nav-link" href="designs">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M15.825.12a.5.5 0 0 1 .132.584c-1.53 3.43-4.743 8.17-7.095 10.64a6.067 6.067 0 0 1-2.373 1.534c-.018.227-.06.538-.16.868-.201.659-.667 1.479-1.708 1.74a8.118 8.118 0 0 1-3.078.132 3.659 3.659 0 0 1-.562-.135 1.382 1.382 0 0 1-.466-.247.714.714 0 0 1-.204-.288.622.622 0 0 1 .004-.443c.095-.245.316-.38.461-.452.394-.197.625-.453.867-.826.095-.144.184-.297.287-.472l.117-.198c.151-.255.326-.54.546-.848.528-.739 1.201-.925 1.746-.896q.19.012.348.048c.062-.172.142-.38.238-.608.261-.619.658-1.419 1.187-2.069 2.176-2.67 6.18-6.206 9.117-8.104a.5.5 0 0 1 .596.04"/>
+                </svg>
+                <span>Diseños</span>
+            </NavLink>
+
+            <NavLink class="nav-link" href="inventory">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5M3.14 5l1.25 5h8.22l1.25-5zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0m9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2m-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0"/>
+                </svg>
+                <span>Inventario</span>
+            </NavLink>
+
+            <NavLink class="nav-link" href="appointments">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4z"/>
+                </svg>
+                <span>Citas</span>
+            </NavLink>
+
+            <div class="nav-divider"></div>
+
+            <NavLink class="nav-link" href="panel">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 4a.5.5 0 0 1 .5.5V6a.5.5 0 0 1-1 0V4.5A.5.5 0 0 1 8 4M3.732 5.732a.5.5 0 0 1 .707 0l.915.914a.5.5 0 1 1-.708.708l-.914-.915a.5.5 0 0 1 0-.707M2 10a.5.5 0 0 1 .5-.5h1.586a.5.5 0 0 1 0 1H2.5A.5.5 0 0 1 2 10m9.5 0a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 0 1H12a.5.5 0 0 1-.5-.5m.754-4.246a.389.389 0 0 0-.527-.02L7.547 9.31a.91.91 0 1 0 1.302 1.258l3.434-4.297a.389.389 0 0 0-.029-.518z"/>
+                    <path fill-rule="evenodd" d="M0 10a8 8 0 1 1 15.547 2.661c-.442 1.253-1.845 1.602-2.932 1.25C11.309 13.488 9.475 13 8 13c-1.474 0-3.31.488-4.615.911-1.087.352-2.49.003-2.932-1.25A7.99 7.99 0 0 1 0 10m8-7a7 7 0 0 0-6.603 9.329c.203.575.923.876 1.68.63C4.397 12.533 6.358 12 8 12s3.604.532 4.923.96c.757.245 1.477-.056 1.68-.631A7 7 0 0 0 8 3"/>
+                </svg>
+                <span>Panel Admin</span>
+            </NavLink>
+        </nav>
     </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="clientes">
-                <span class="bi bi-people-fill" aria-hidden="true"></span> Clientes
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="inventario">
-                <span class="bi bi-box-seam" aria-hidden="true"></span> Inventario
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="artistas">
-                <span class="bi bi-palette-fill" aria-hidden="true"></span> Artistas
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="disenos">
-                <span class="bi bi-brush-fill" aria-hidden="true"></span> Diseños
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="citas">
-                <span class="bi bi-calendar-fill" aria-hidden="true"></span> Citas
-            </NavLink>
-        </div>
-    </nav>
-</div>
+<style>
+    .santtoary-sidebar {
+        height: 100%;
+        background-color: #0d0d0d;
+        border-right: 1px solid #1a1a1a;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 1.6rem 1.4rem 1.2rem;
+        border-bottom: 1px solid #1a1a1a;
+    }
+
+    .brand-mark {
+        color: #c9a84c;
+        font-size: 1rem;
+    }
+
+    .brand-name {
+        font-family: 'Cinzel', serif;
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #c9a84c;
+        letter-spacing: 0.15em;
+    }
+
+    .nav-toggler {
+        display: none;
+        background: none;
+        border: none;
+        color: #c9a84c;
+        font-size: 1.4rem;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+    }
+
+    .nav-body {
+        padding: 1rem 0.75rem;
+        flex: 1;
+    }
+
+    .nav-section {
+        font-size: 0.62rem;
+        letter-spacing: 0.18em;
+        color: #333;
+        padding: 1rem 0.6rem 0.4rem;
+        font-family: 'Raleway', sans-serif;
+        font-weight: 600;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 0.75rem;
+        border-radius: 6px;
+        color: #555 !important;
+        font-family: 'Raleway', sans-serif;
+        font-size: 0.875rem;
+        font-weight: 500;
+        letter-spacing: 0.03em;
+        text-decoration: none;
+        transition: all 0.18s ease;
+        margin-bottom: 2px;
+    }
+
+    .nav-link:hover {
+        color: #c9a84c !important;
+        background-color: #c9a84c0d;
+    }
+
+    .nav-link.active {
+        color: #c9a84c !important;
+        background-color: #c9a84c15;
+        border-left: 2px solid #c9a84c;
+        padding-left: calc(0.75rem - 2px);
+    }
+
+    .nav-link svg {
+        flex-shrink: 0;
+        opacity: 0.6;
+        transition: opacity 0.18s ease;
+    }
+
+    .nav-link:hover svg,
+    .nav-link.active svg {
+        opacity: 1;
+    }
+
+    .nav-divider {
+        height: 1px;
+        background: #1a1a1a;
+        margin: 0.75rem 0.5rem;
+    }
+
+        @@media (max-width: 640px) {
+        .nav-toggler {
+            display: block;
+        }
+
+        .nav-body.collapse {
+            display: none;
+        }
+    }
+</style>
 
 @code {
     private bool collapseNavMenu = true;
-
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;

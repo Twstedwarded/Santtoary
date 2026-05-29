@@ -22,6 +22,29 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddIdentity<User, IdentityRole>(x =>
 {
+    x.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+    x.SignIn.RequireConfirmedEmail = true;
+    x.User.RequireUniqueEmail = true;
+    x.Password.RequireDigit = false;
+    x.Password.RequiredUniqueChars = 0;
+    x.Password.RequireLowercase = false;
+    x.Password.RequireNonAlphanumeric = false;
+    x.Password.RequireUppercase = false;
+    x.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    x.Lockout.MaxFailedAccessAttempts = 3;
+    x.Lockout.AllowedForNewUsers = true;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
+
+
+builder.Services.AddScoped<SeedDb>();
+builder.Services.AddScoped<IMailHelper, MailHelper>();
+
+
+
+builder.Services.AddIdentity<User, IdentityRole>(x =>
+{
     x.User.RequireUniqueEmail = true;
     x.Password.RequireDigit = false;
     x.Password.RequiredUniqueChars = 0;
@@ -59,7 +82,6 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-
 app.UseCors();
 
 using (var scope = app.Services.CreateScope())
@@ -90,7 +112,6 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
