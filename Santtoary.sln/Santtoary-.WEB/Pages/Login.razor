@@ -44,7 +44,6 @@
 
     </div>
 </div>
-
 @code {
     LoginDTO loginModel = new();
     private string? mensajeError;
@@ -52,14 +51,40 @@
     private async Task HandleLogin()
     {
         mensajeError = null;
-        var response = await Http.PostAsJsonAsync("api/users/login", loginModel);
-        if (response.IsSuccessStatusCode)
-            Nav.NavigateTo("/panel");
-        else
-            mensajeError = "Usuario o contraseña incorrectos.";
+
+        try
+        {
+            var response = await Http.PostAsJsonAsync("api/users/login", loginModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Si tienes lógica para guardar el token, ponla aquí.
+                // Por ahora solo navegamos.
+                Nav.NavigateTo("/panel");
+            }
+            else
+            {
+                // AQUÍ ESTÁ EL TRUCO: Leemos lo que el servidor dice realmente
+                var errorContent = await response.Content.ReadAsStringAsync();
+
+                if (string.IsNullOrEmpty(errorContent))
+                {
+                    mensajeError = "Usuario o contraseña incorrectos.";
+                }
+                else
+                {
+                    // Mostramos el mensaje exacto que viene del servidor
+                    // (Ej: "El correo no ha sido confirmado")
+                    mensajeError = errorContent;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            mensajeError = "Error de conexión: " + ex.Message;
+        }
     }
 }
-
 <style>
     .auth-page {
         min-height: 100vh;
